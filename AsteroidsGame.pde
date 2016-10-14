@@ -7,9 +7,16 @@ public void draw()
 {
   //your code here
 }
-class SpaceShip //extends Floater  
-{   
-    //your code here
+class SpaceShip extends Floater  
+{
+    corners = ;
+    xCorners = new int[corners];
+    yCorners = new int[corners];
+    xCorners[0] = 16;
+    xCorners[1] = 8;
+    xCorners[2] = 4;
+    xCorners[3] = 2;
+    xCorners[4] = 2;
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
 {   
