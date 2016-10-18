@@ -1,7 +1,8 @@
 //your variable declarations here
 public void setup() 
 {
-  //your code here
+  size(500,300);
+  SpaceShip shipMagellan = new SpaceShip();
 }
 public void draw() 
 {
@@ -9,14 +10,29 @@ public void draw()
 }
 class SpaceShip extends Floater  
 {
-    corners = ;
-    xCorners = new int[corners];
-    yCorners = new int[corners];
-    xCorners[0] = 16;
-    xCorners[1] = 8;
-    xCorners[2] = 4;
-    xCorners[3] = 2;
-    xCorners[4] = 2;
+    public SpaceShip()
+    {
+      corners = 0;
+      xCorners = new int[corners];
+      yCorners = new int[corners];
+      int [] xCornersTemp = {16,8,4,2,2 ,6 ,6 ,-6,-6,-2,-2,-4,-8,-8,-4,-2, -2, -6, -6,  6,  6,  2,  2,  4, 8,16};
+      int [] yCornersTemp = {2 ,4,8,8,10,10,14,14,10,10, 8, 8, 4,-4,-8,-8,-10,-10,-14,-14,-10,-10,-16,-16,-4,-2};
+      xCorners = xCornersTemp;
+      yCorners = yCornersTemp;
+      myColor = color(255);
+      myCenterX = 500;
+      myCenterY = 300;
+      myDirectionX = 0;
+      myDirectionY = 0;
+      myPointDirection = 270;
+    }
+    public void setX(int x) {myCenterX = x;}
+    public int getX(){return myCenterX;}
+    public void setY(int y) {myCenterY = y;}
+    public int getY(){return myCenterY;};
+    public void setDirectionX (double x){myDirectionX = x;}
+    public void setDirectionY (double y){myDirectionY = y;}
+    public void getPointDirection(int degrees){myPointDirection = degrees;}
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
 {   
