@@ -1,22 +1,45 @@
+SpaceShip shipMagellan;
+float decelspd = 0.1;
 //your variable declarations here
 public void setup() 
 {
-  size(500,300);
-  SpaceShip shipMagellan = new SpaceShip();
+  size(1000,600);
+  shipMagellan = new SpaceShip();
 }
 public void draw() 
 {
-  //your code here
+  background(0);
+  shipMagellan.show();
+  shipMagellan.move();
+}
+public void keyPressed()
+{
+  if ((key == 'w') || (key == 'W'))
+  {
+    shipMagellan.accelerate(270);
+  }
+  if ((key == 's')||(key=='S'))
+  {
+    shipMagellan.accelerate(90);
+  }
+  if ((key == 'a')||(key=='A'))
+  {
+    shipMagellan.accelerate(180);
+  }
+  if ((key == 'd')||(key=='D'))
+  {
+    shipMagellan.accelerate(0);
+  }
 }
 class SpaceShip extends Floater  
 {
     public SpaceShip()
     {
-      corners = 0;
+      corners = 26;
       xCorners = new int[corners];
       yCorners = new int[corners];
-      int [] xCornersTemp = {16,8,4,2,2 ,6 ,6 ,-6,-6,-2,-2,-4,-8,-8,-4,-2, -2, -6, -6,  6,  6,  2,  2,  4, 8,16};
-      int [] yCornersTemp = {2 ,4,8,8,10,10,14,14,10,10, 8, 8, 4,-4,-8,-8,-10,-10,-14,-14,-10,-10,-16,-16,-4,-2};
+      int [] xCornersTemp = {16,8,4,2,2 ,6 ,6 ,-6,-6,-2,-2,-4,-8,-8,-4,-2, -2, -6, -6,  6,  6,  2, 2, 4, 8,16};
+      int [] yCornersTemp = {2 ,4,8,8,10,10,14,14,10,10, 8, 8, 4,-4,-8,-8,-10,-10,-14,-14,-10,-10,-8,-8,-4,-2};
       xCorners = xCornersTemp;
       yCorners = yCornersTemp;
       myColor = color(255);
@@ -24,15 +47,51 @@ class SpaceShip extends Floater
       myCenterY = 300;
       myDirectionX = 0;
       myDirectionY = 0;
-      myPointDirection = 270;
+      myPointDirection = 0;
     }
     public void setX(int x) {myCenterX = x;}
-    public int getX(){return myCenterX;}
+    public int getX(){return (int)myCenterX;}
     public void setY(int y) {myCenterY = y;}
-    public int getY(){return myCenterY;};
+    public int getY(){return (int)myCenterY;};
     public void setDirectionX (double x){myDirectionX = x;}
+    public double getDirectionX() {return myDirectionX;}
     public void setDirectionY (double y){myDirectionY = y;}
-    public void getPointDirection(int degrees){myPointDirection = degrees;}
+    public double getDirectionY(){return myDirectionY;}
+    public void setPointDirection(int degrees){myPointDirection = degrees;}
+    public double getPointDirection(){return myPointDirection;}
+    public void accelerate(int inputDir)
+    {
+      if (keyPressed)
+      {
+        double dRadians =inputDir*(Math.PI/180);
+        myDirectionX += (Math.cos(dRadians));    
+        myDirectionY += (Math.sin(dRadians));   
+      }else
+      {
+        if (myDirectionX!=0)
+        {
+          if (myDirectionX>0)
+          {
+            myDirectionX-=myDirectionX*decelspd;
+          }
+          if (myDirectionX<0)
+          {
+            myDirectionX+=myDirectionX*decelspd;
+          }
+        }
+        if (myDirectionY!=0)
+        {
+          if (myDirectionY>0)
+          {
+            myDirectionY-=myDirectionY*decelspd;
+          }
+          if (myDirectionY<0)
+          {
+            myDirectionY+=myDirectionY*decelspd;
+          }
+        }
+      }
+    }
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
 {   
