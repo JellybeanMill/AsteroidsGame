@@ -9,8 +9,12 @@ public void setup()
 public void draw() 
 {
   background(0);
+  shipMagellan.rotate();
   shipMagellan.show();
   shipMagellan.move();
+}
+public void mousePressed()
+{
 }
 public void keyPressed()
 {
@@ -29,6 +33,31 @@ public void keyPressed()
   if ((key == 'd')||(key=='D'))
   {
     shipMagellan.accelerate(0);
+  }
+  if ((key == 'z')||(key=='Z'))
+  {
+    if (shipMagellan.getDirectionX()!=0)
+    {
+       if (shipMagellan.getDirectionX()>0)
+       {
+         shipMagellan.setDirectionX(shipMagellan.getDirectionX()-shipMagellan.getDirectionX()*decelspd);
+       }
+       if (shipMagellan.getDirectionX()<0)
+       {
+         shipMagellan.setDirectionX(shipMagellan.getDirectionX()-shipMagellan.getDirectionX()*decelspd);
+       }
+     }
+     if (shipMagellan.getDirectionY()!=0)
+     {
+       if (shipMagellan.getDirectionY()>0)
+       {
+         shipMagellan.setDirectionY(shipMagellan.getDirectionY()-shipMagellan.getDirectionY()*decelspd);
+       }
+      if (shipMagellan.getDirectionY()<0)
+      {
+          shipMagellan.setDirectionY(shipMagellan.getDirectionY()-shipMagellan.getDirectionY()*decelspd);
+      }
+    }
   }
 }
 class SpaceShip extends Floater  
@@ -61,37 +90,35 @@ class SpaceShip extends Floater
     public double getPointDirection(){return myPointDirection;}
     public void accelerate(int inputDir)
     {
-      if (keyPressed)
+      if (keyPressed==true)
       {
         double dRadians =inputDir*(Math.PI/180);
         myDirectionX += (Math.cos(dRadians));    
         myDirectionY += (Math.sin(dRadians));   
-      }else
-      {
-        if (myDirectionX!=0)
-        {
-          if (myDirectionX>0)
-          {
-            myDirectionX-=myDirectionX*decelspd;
-          }
-          if (myDirectionX<0)
-          {
-            myDirectionX+=myDirectionX*decelspd;
-          }
-        }
-        if (myDirectionY!=0)
-        {
-          if (myDirectionY>0)
-          {
-            myDirectionY-=myDirectionY*decelspd;
-          }
-          if (myDirectionY<0)
-          {
-            myDirectionY+=myDirectionY*decelspd;
-          }
-        }
       }
     }
+    public void rotate(){myPointDirection=((-Math.atan2(mouseX-myCenterX, mouseY-myCenterY))*180/PI)+90;}
+    public void move ()   //move the floater in the current direction of travel
+    {    
+      myCenterX += myDirectionX;    
+      myCenterY += myDirectionY;
+      if(myCenterX >width+20)
+      {     
+        myCenterX = 0;    
+      }    
+      else if (myCenterX<-20)
+      {     
+        myCenterX = width;    
+      }    
+      if(myCenterY >height+20)
+      {    
+        myCenterY = 0;    
+      }   
+      else if (myCenterY < -20)
+      {     
+        myCenterY = height;    
+      }   
+    }   
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
 {   
@@ -112,7 +139,6 @@ abstract class Floater //Do NOT modify the Floater class! Make changes in the Sp
   abstract public double getDirectionY();   
   abstract public void setPointDirection(int degrees);   
   abstract public double getPointDirection(); 
-
   //Accelerates the floater in the direction it is pointing (myPointDirection)   
   public void accelerate (double dAmount)   
   {          
