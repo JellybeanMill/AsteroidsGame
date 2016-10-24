@@ -18,24 +18,24 @@ public void mousePressed()
 }
 public void keyPressed()
 {
-  if ((key == 'w') || (key == 'W'))
-  {
-    shipMagellan.accelerate(270);
-  }
-  if ((key == 's')||(key=='S'))
-  {
-    shipMagellan.accelerate(90);
-  }
-  if ((key == 'a')||(key=='A'))
-  {
-    shipMagellan.accelerate(180);
-  }
-  if ((key == 'd')||(key=='D'))
-  {
-    shipMagellan.accelerate(0);
-  }
-  if ((key == 'z')||(key=='Z'))
-  {
+    if ((key == 'w') || (key == 'W'))
+    {
+        shipMagellan.accelerate(270);
+    }
+    if ((key == 's')||(key=='S'))
+    {
+        shipMagellan.accelerate(90);
+    }
+    if ((key == 'a')||(key=='A'))
+    {
+        shipMagellan.accelerate(180);
+    }
+    if ((key == 'd')||(key=='D'))
+    {
+        shipMagellan.accelerate(0);
+    }
+    if ((key == 'z')||(key=='Z'))
+    {
     if (shipMagellan.getDirectionX()!=0)
     {
        if (shipMagellan.getDirectionX()>0)
@@ -64,19 +64,19 @@ class SpaceShip extends Floater
 {
     public SpaceShip()
     {
-      corners = 26;
-      xCorners = new int[corners];
-      yCorners = new int[corners];
-      int [] xCornersTemp = {16,8,4,2,2 ,6 ,6 ,-6,-6,-2,-2,-4,-8,-8,-4,-2, -2, -6, -6,  6,  6,  2, 2, 4, 8,16};
-      int [] yCornersTemp = {2 ,4,8,8,10,10,14,14,10,10, 8, 8, 4,-4,-8,-8,-10,-10,-14,-14,-10,-10,-8,-8,-4,-2};
-      xCorners = xCornersTemp;
-      yCorners = yCornersTemp;
-      myColor = color(255);
-      myCenterX = 500;
-      myCenterY = 300;
-      myDirectionX = 0;
-      myDirectionY = 0;
-      myPointDirection = 0;
+        corners = 26;
+        xCorners = new int[corners];
+        yCorners = new int[corners];
+        int [] xCornersTemp = {16,8,4,2,2 ,6 ,6 ,-6,-6,-2,-2,-4,-8,-8,-4,-2, -2, -6, -6,  6,  6,  2, 2, 4, 8,16};
+        int [] yCornersTemp = {2 ,4,8,8,10,10,14,14,10,10, 8, 8, 4,-4,-8,-8,-10,-10,-14,-14,-10,-10,-8,-8,-4,-2};
+        xCorners = xCornersTemp;
+        yCorners = yCornersTemp;
+        myColor = color(255);
+        myCenterX = 500;
+        myCenterY = 300;
+        myDirectionX = 0;
+        myDirectionY = 0;
+        myPointDirection = 0;
     }
     public void setX(int x) {myCenterX = x;}
     public int getX(){return (int)myCenterX;}
@@ -90,34 +90,44 @@ class SpaceShip extends Floater
     public double getPointDirection(){return myPointDirection;}
     public void accelerate(int inputDir)
     {
-      if (keyPressed==true)
-      {
-        double dRadians =inputDir*(Math.PI/180);
-        myDirectionX += (Math.cos(dRadians));    
-        myDirectionY += (Math.sin(dRadians));   
+      	if (keyPressed==true)
+      	{
+        	double dRadians =inputDir*(Math.PI/180);
+        	myDirectionX += (Math.cos(dRadians));    
+        	myDirectionY += (Math.sin(dRadians));
+    	}
+    	else
+    	{
+    		if (myDirectionX != 0)
+    		{
+    			if (myDirectionX>0) {myDirectionX-=0.025;}
+    			if (myDirectionY<0) {myDirectionX+=0.025;}
+    		}
+    		if (myDirectionY)
+    	}
       }
     }
     public void rotate(){myPointDirection=((-Math.atan2(mouseX-myCenterX, mouseY-myCenterY))*180/PI)+90;}
     public void move ()   //move the floater in the current direction of travel
     {    
-      myCenterX += myDirectionX;    
-      myCenterY += myDirectionY;
-      if(myCenterX >width+20)
-      {     
-        myCenterX = 0;    
-      }    
-      else if (myCenterX<-20)
-      {     
-        myCenterX = width;    
-      }    
-      if(myCenterY >height+20)
-      {    
-        myCenterY = 0;    
-      }   
-      else if (myCenterY < -20)
-      {     
-        myCenterY = height;    
-      }   
+        myCenterX += myDirectionX;    
+        myCenterY += myDirectionY;
+        if(myCenterX >width+20)
+        {     
+            myCenterX = 0;    
+        }    
+        else if (myCenterX<-20)
+        {     
+            myCenterX = width;    
+        }    
+        if(myCenterY >height+20)
+        {    
+            myCenterY = 0;    
+        }   
+        else if (myCenterY < -20)
+        {     
+            myCenterY = height;    
+        }   
     }   
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
