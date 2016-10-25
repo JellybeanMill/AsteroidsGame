@@ -1,5 +1,10 @@
 SpaceShip shipMagellan;
 float decelspd = 0.1;
+//input variables
+boolean keyW = false;
+boolean keyA = false;
+boolean keyS = false;
+boolean keyD = false;
 //your variable declarations here
 public void setup() 
 {
@@ -12,53 +17,24 @@ public void draw()
   shipMagellan.rotate();
   shipMagellan.show();
   shipMagellan.move();
+  if (keyPressed==false) {shipMagellan.accelerate(-16);}
 }
 public void mousePressed()
 {
 }
 public void keyPressed()
 {
-    if ((key == 'w') || (key == 'W'))
-    {
-        shipMagellan.accelerate(270);
-    }
-    if ((key == 's')||(key=='S'))
-    {
-        shipMagellan.accelerate(90);
-    }
-    if ((key == 'a')||(key=='A'))
-    {
-        shipMagellan.accelerate(180);
-    }
-    if ((key == 'd')||(key=='D'))
-    {
-        shipMagellan.accelerate(0);
-    }
-    if ((key == 'z')||(key=='Z'))
-    {
-    if (shipMagellan.getDirectionX()!=0)
-    {
-       if (shipMagellan.getDirectionX()>0)
-       {
-         shipMagellan.setDirectionX(shipMagellan.getDirectionX()-shipMagellan.getDirectionX()*decelspd);
-       }
-       if (shipMagellan.getDirectionX()<0)
-       {
-         shipMagellan.setDirectionX(shipMagellan.getDirectionX()-shipMagellan.getDirectionX()*decelspd);
-       }
-     }
-     if (shipMagellan.getDirectionY()!=0)
-     {
-       if (shipMagellan.getDirectionY()>0)
-       {
-         shipMagellan.setDirectionY(shipMagellan.getDirectionY()-shipMagellan.getDirectionY()*decelspd);
-       }
-      if (shipMagellan.getDirectionY()<0)
-      {
-          shipMagellan.setDirectionY(shipMagellan.getDirectionY()-shipMagellan.getDirectionY()*decelspd);
-      }
-    }
-  }
+	if ((key == 'w')||(key=='W')) {keyW = true;}
+	if ((key == 's')||(key=='S')) {keyS = true;}
+	if ((key == 'a')||(key=='A')) {keyA = true;}
+	if ((key == 'd')||(key=='D')) {keyD = true;}
+}
+public void keyReleased()
+{
+	if ((key == 'w')||(key=='W')) {keyW = false;}
+	if ((key == 's')||(key=='S')) {keyS = false;}
+	if ((key == 'a')||(key=='A')) {keyA = false;}
+	if ((key == 'd')||(key=='D')) {keyD = false;}
 }
 class SpaceShip extends Floater  
 {
@@ -81,7 +57,7 @@ class SpaceShip extends Floater
     public void setX(int x) {myCenterX = x;}
     public int getX(){return (int)myCenterX;}
     public void setY(int y) {myCenterY = y;}
-    public int getY(){return (int)myCenterY;};
+    public int getY(){return (int)myCenterY;}
     public void setDirectionX (double x){myDirectionX = x;}
     public double getDirectionX() {return myDirectionX;}
     public void setDirectionY (double y){myDirectionY = y;}
@@ -90,22 +66,25 @@ class SpaceShip extends Floater
     public double getPointDirection(){return myPointDirection;}
     public void accelerate(int inputDir)
     {
-      	if (keyPressed==true)
+      	if (inputDir>=0)
       	{
         	double dRadians =inputDir*(Math.PI/180);
-        	myDirectionX += (Math.cos(dRadians));    
-        	myDirectionY += (Math.sin(dRadians));
+        	myDirectionX = (Math.cos(dRadians))*3;    
+        	myDirectionY = (Math.sin(dRadians))*3;
     	}
     	else
     	{
     		if (myDirectionX != 0)
     		{
-    			if (myDirectionX>0) {myDirectionX-=0.025;}
-    			if (myDirectionY<0) {myDirectionX+=0.025;}
+    			if (myDirectionX>0) {myDirectionX-=0.05;}
+    			if (myDirectionX<0) {myDirectionX+=0.05;}
     		}
-    		if (myDirectionY)
+    		if (myDirectionY != 0)
+    		{
+    			if (myDirectionY>0) {myDirectionY-=0.05;}
+    			if (myDirectionY<0) {myDirectionY+=0.05;} 
+    		}
     	}
-      }
     }
     public void rotate(){myPointDirection=((-Math.atan2(mouseX-myCenterX, mouseY-myCenterY))*180/PI)+90;}
     public void move ()   //move the floater in the current direction of travel
@@ -126,7 +105,7 @@ class SpaceShip extends Floater
         }   
         else if (myCenterY < -20)
         {     
-            myCenterY = height;    
+    		myCenterY = height;
         }   
     }   
 }
