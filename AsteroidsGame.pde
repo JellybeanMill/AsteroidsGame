@@ -17,7 +17,7 @@ public void draw()
   shipMagellan.rotate();
   shipMagellan.show();
   shipMagellan.move();
-  if (keyPressed==false) {shipMagellan.accelerate(-16);}
+  shipMagellan.accelerate();
 }
 public void mousePressed()
 {
@@ -64,27 +64,22 @@ class SpaceShip extends Floater
     public double getDirectionY(){return myDirectionY;}
     public void setPointDirection(int degrees){myPointDirection = degrees;}
     public double getPointDirection(){return myPointDirection;}
-    public void accelerate(int inputDir)
+    public void accelerate()
     {
-      	if (inputDir>=0)
+      	if (keyW==true) {myDirectionY=-2.5;}
+      	if (keyA==true) {myDirectionX=-2.5;}
+      	if (keyS==true) {myDirectionY=2.5;}
+      	if (keyD==true) {myDirectionX=2.5;}
+      	if (keyW==false&&keyS==false&&myDirectionY!=0)
       	{
-        	double dRadians =inputDir*(Math.PI/180);
-        	myDirectionX = (Math.cos(dRadians))*3;    
-        	myDirectionY = (Math.sin(dRadians))*3;
-    	}
-    	else
-    	{
-    		if (myDirectionX != 0)
-    		{
-    			if (myDirectionX>0) {myDirectionX-=0.05;}
-    			if (myDirectionX<0) {myDirectionX+=0.05;}
-    		}
-    		if (myDirectionY != 0)
-    		{
-    			if (myDirectionY>0) {myDirectionY-=0.05;}
-    			if (myDirectionY<0) {myDirectionY+=0.05;} 
-    		}
-    	}
+      		if (myDirectionY>0) {myDirectionY-=0.05;}
+      		if (myDirectionY<0) {myDirectionY+=0.05;}
+      	}
+      	if (keyA==false&&keyD==false&&myDirectionX!=0)
+      	{
+      		if (myDirectionX>0) {myDirectionX-=0.05;}
+      		if (myDirectionX<0) {myDirectionX+=0.05;}
+      	}
     }
     public void rotate(){myPointDirection=((-Math.atan2(mouseX-myCenterX, mouseY-myCenterY))*180/PI)+90;}
     public void move ()   //move the floater in the current direction of travel
@@ -108,6 +103,51 @@ class SpaceShip extends Floater
     		myCenterY = height;
         }   
     }   
+}
+class Bullet extends Floater
+{
+	private int fuelPoint;
+	public Bullet()
+    {
+        corners = 8;
+        xCorners = new int[corners];
+        yCorners = new int[corners];
+        int [] xCornersTemp = {0,1,3, 1, 0,-1,-3,-1};
+        int [] yCornersTemp = {3,1,0,-1,-3,-1, 0, 1};
+        xCorners = xCornersTemp;
+        yCorners = yCornersTemp;
+        myColor = color(0,0,255);
+        myCenterX = 500;
+        myCenterY = 300;
+        myDirectionX = 0;
+        myDirectionY = 0;
+        myPointDirection = 0;
+    }
+    public void setX(int x) {myCenterX = x;}
+    public int getX(){return (int)myCenterX;}
+    public void setY(int y) {myCenterY = y;}
+    public int getY(){return (int)myCenterY;}
+    public void setDirectionX (double x){myDirectionX = x;}
+    public double getDirectionX() {return myDirectionX;}
+    public void setDirectionY (double y){myDirectionY = y;}
+    public double getDirectionY(){return myDirectionY;}
+    public void setPointDirection(int degrees){myPointDirection = degrees;}
+    public double getPointDirection(){return myPointDirection;}
+    public void rotate()
+    {
+    	myPointDirection += 1;
+    	if (myPointDirection>=360) {myPointDirection=0;}
+    }
+    public void accelerate()
+    {
+    	double dRadians =shipMagellan.getPointDirection()*(Math.PI/180);
+    	myDirectionX = (2.5 * Math.cos(dRadians));
+    	myDirectionY = (2.5 * Math.sin(dRadians));
+    }
+    public void move()
+    {
+
+    }
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
 {   
