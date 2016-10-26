@@ -1,26 +1,51 @@
 SpaceShip shipMagellan;
-float decelspd = 0.1;
+Bullet [] bulletList;
 //input variables
 boolean keyW = false;
 boolean keyA = false;
 boolean keyS = false;
 boolean keyD = false;
 //your variable declarations here
+float speedCont = 5;
+int bulletListLength = 0;
 public void setup() 
 {
-  size(1000,600);
-  shipMagellan = new SpaceShip();
+	size(1000,600);
+	shipMagellan = new SpaceShip();
+	bulletList = new Bullet[300];
 }
 public void draw() 
 {
-  background(0);
-  shipMagellan.rotate();
-  shipMagellan.show();
-  shipMagellan.move();
-  shipMagellan.accelerate();
+	background(0);
+	for (int i=0;i<bulletListLength;i++)
+	{
+		bulletList[i].move();
+		bulletList[i].rotate();
+		bulletList[i].show();
+	}
+	shipMagellan.rotate();
+	shipMagellan.show();
+	shipMagellan.move();
+	shipMagellan.accelerate();
 }
 public void mousePressed()
 {
+	int bulletNum=1024;
+	for(int i=0;i<bulletListLength;i++)
+	{
+		if(bulletList[i].getDead()==true) {bulletNum = i;}
+	}
+	if (bulletNum!=1024)
+	{
+		bulletList[bulletNum] = new Bullet();
+		bulletList[bulletNum].accelerate();
+	}
+	else
+	{
+		bulletList[bulletListLength] = new Bullet();
+		bulletList[bulletListLength].accelerate();
+		bulletListLength+=1;
+	}
 }
 public void keyPressed()
 {
@@ -66,19 +91,21 @@ class SpaceShip extends Floater
     public double getPointDirection(){return myPointDirection;}
     public void accelerate()
     {
-      	if (keyW==true) {myDirectionY=-2.5;}
-      	if (keyA==true) {myDirectionX=-2.5;}
-      	if (keyS==true) {myDirectionY=2.5;}
-      	if (keyD==true) {myDirectionX=2.5;}
+      	if (keyW==true) {myDirectionY=-speedCont;}
+      	if (keyA==true) {myDirectionX=-speedCont;}
+      	if (keyS==true) {myDirectionY= speedCont;}
+      	if (keyD==true) {myDirectionX= speedCont;}
       	if (keyW==false&&keyS==false&&myDirectionY!=0)
       	{
-      		if (myDirectionY>0) {myDirectionY-=0.05;}
-      		if (myDirectionY<0) {myDirectionY+=0.05;}
+      		if (myDirectionY>0) {myDirectionY-=speedCont*0.05;}
+      		if (myDirectionY<0) {myDirectionY+=speedCont*0.05;}
+      		if (abs((float)myDirectionY)<speedCont*0.05) {myDirectionY=0;}
       	}
       	if (keyA==false&&keyD==false&&myDirectionX!=0)
       	{
-      		if (myDirectionX>0) {myDirectionX-=0.05;}
-      		if (myDirectionX<0) {myDirectionX+=0.05;}
+      		if (myDirectionX>0) {myDirectionX-=speedCont*0.05;}
+      		if (myDirectionX<0) {myDirectionX+=speedCont*0.05;}
+			if (abs((float)myDirectionX)<speedCont*0.05) {myDirectionX=0;}
       	}
     }
     public void rotate(){myPointDirection=((-Math.atan2(mouseX-myCenterX, mouseY-myCenterY))*180/PI)+90;}
@@ -107,8 +134,9 @@ class SpaceShip extends Floater
 class Bullet extends Floater
 {
 	private int fuelPoint;
+	private boolean isDead;
 	public Bullet()
-    {
+	{
         corners = 8;
         xCorners = new int[corners];
         yCorners = new int[corners];
@@ -117,11 +145,13 @@ class Bullet extends Floater
         xCorners = xCornersTemp;
         yCorners = yCornersTemp;
         myColor = color(0,0,255);
-        myCenterX = 500;
-        myCenterY = 300;
+        myCenterX = shipMagellan.getX();
+        myCenterY = shipMagellan.getY();
         myDirectionX = 0;
         myDirectionY = 0;
         myPointDirection = 0;
+        fuelPoint = 225;
+        isDead = false;
     }
     public void setX(int x) {myCenterX = x;}
     public int getX(){return (int)myCenterX;}
@@ -133,6 +163,7 @@ class Bullet extends Floater
     public double getDirectionY(){return myDirectionY;}
     public void setPointDirection(int degrees){myPointDirection = degrees;}
     public double getPointDirection(){return myPointDirection;}
+    public boolean getDead() {return isDead;}
     public void rotate()
     {
     	myPointDirection += 1;
@@ -141,12 +172,20 @@ class Bullet extends Floater
     public void accelerate()
     {
     	double dRadians =shipMagellan.getPointDirection()*(Math.PI/180);
-    	myDirectionX = (2.5 * Math.cos(dRadians));
-    	myDirectionY = (2.5 * Math.sin(dRadians));
+    	myDirectionX = (speedCont*1.25 * Math.cos(dRadians));
+    	myDirectionY = (speedCont*1.25 * Math.sin(dRadians));
     }
     public void move()
     {
-
+    	myCenterX+=myDirectionX;
+    	myCenterY+=myDirectionY;
+    	if (myCenterX<-20) {myCenterX=width+20;}
+    	if (myCenterX>width+20) {myCenterX=-20;}
+    	if (myCenterY<-20) {myCenterY=width+20;}
+    	if (myCenterY>width+20) {myCenterY=-20;}
+    	fuelPoint-=1;
+    	if (fuelPoint >=0) {myColor = color(0,0,fuelPoint);}
+    	else {isDead =true;}
     }
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
