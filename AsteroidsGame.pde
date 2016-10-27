@@ -128,7 +128,7 @@ class SpaceShip extends Floater
         else if (myCenterY < -20)
         {     
     		myCenterY = height;
-        }   
+        }
     }   
 }
 class Bullet extends Floater
