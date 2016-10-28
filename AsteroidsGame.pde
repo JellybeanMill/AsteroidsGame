@@ -53,6 +53,7 @@ public void keyPressed()
 	if ((key == 's')||(key=='S')) {keyS = true;}
 	if ((key == 'a')||(key=='A')) {keyA = true;}
 	if ((key == 'd')||(key=='D')) {keyD = true;}
+	if ((key == " ")) {keySpace = true;}
 }
 public void keyReleased()
 {
@@ -60,9 +61,15 @@ public void keyReleased()
 	if ((key == 's')||(key=='S')) {keyS = false;}
 	if ((key == 'a')||(key=='A')) {keyA = false;}
 	if ((key == 'd')||(key=='D')) {keyD = false;}
+	if ((key == " ")) {keySpace = false;}
+}
+public void loadBar()
+{
+
 }
 class SpaceShip extends Floater  
 {
+	private warpPoint;
     public SpaceShip()
     {
         corners = 26;
@@ -78,6 +85,7 @@ class SpaceShip extends Floater
         myDirectionX = 0;
         myDirectionY = 0;
         myPointDirection = 0;
+        warpPoint = 0;
     }
     public void setX(int x) {myCenterX = x;}
     public int getX(){return (int)myCenterX;}
@@ -109,8 +117,15 @@ class SpaceShip extends Floater
       	}
     }
     public void rotate(){myPointDirection=((-Math.atan2(mouseX-myCenterX, mouseY-myCenterY))*180/PI)+90;}
-    public void move ()   //move the floater in the current direction of travel
-    {    
+    public void move ()
+    {   
+    	if (warpPoint>=180)
+    	{
+    		warpPoint = 180;
+    	}else
+    	{
+    		warpPoint++;
+    	}
         myCenterX += myDirectionX;    
         myCenterY += myDirectionY;
         if(myCenterX >width+20)
@@ -128,6 +143,11 @@ class SpaceShip extends Floater
         else if (myCenterY < -20)
         {     
     		myCenterY = height;
+        }
+        if (keySpace == true&&warpPoint>=180)
+        {
+        	myCenterX = mouseX;
+        	myCenterY = mouseY;
         }
     }   
 }
