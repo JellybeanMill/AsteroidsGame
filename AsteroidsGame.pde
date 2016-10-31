@@ -5,6 +5,7 @@ boolean keyW = false;
 boolean keyA = false;
 boolean keyS = false;
 boolean keyD = false;
+boolean keySpace = false;
 //your variable declarations here
 float speedCont = 5;
 int bulletListLength = 0;
@@ -53,7 +54,7 @@ public void keyPressed()
 	if ((key == 's')||(key=='S')) {keyS = true;}
 	if ((key == 'a')||(key=='A')) {keyA = true;}
 	if ((key == 'd')||(key=='D')) {keyD = true;}
-	if ((key == " ")) {keySpace = true;}
+	if ((key == ' ')) {keySpace = true;}
 }
 public void keyReleased()
 {
@@ -61,7 +62,7 @@ public void keyReleased()
 	if ((key == 's')||(key=='S')) {keyS = false;}
 	if ((key == 'a')||(key=='A')) {keyA = false;}
 	if ((key == 'd')||(key=='D')) {keyD = false;}
-	if ((key == " ")) {keySpace = false;}
+	if ((key == ' ')) {keySpace = false;}
 }
 public void loadBar()
 {
@@ -69,7 +70,7 @@ public void loadBar()
 }
 class SpaceShip extends Floater  
 {
-	private warpPoint;
+	private int warpPoint;
     public SpaceShip()
     {
         corners = 26;
@@ -119,14 +120,7 @@ class SpaceShip extends Floater
     public void rotate(){myPointDirection=((-Math.atan2(mouseX-myCenterX, mouseY-myCenterY))*180/PI)+90;}
     public void move ()
     {   
-    	if (warpPoint>=180)
-    	{
-    		warpPoint = 180;
-    	}else
-    	{
-    		warpPoint++;
-    	}
-        myCenterX += myDirectionX;    
+    	myCenterX += myDirectionX;    
         myCenterY += myDirectionY;
         if(myCenterX >width+20)
         {     
@@ -146,9 +140,20 @@ class SpaceShip extends Floater
         }
         if (keySpace == true&&warpPoint>=180)
         {
-        	myCenterX = mouseX;
-        	myCenterY = mouseY;
+        	double dRadians =myPointDirection*(Math.PI/180);
+        	if (dist(myCenterX+(75*Math.cos(dRadians)),dist(myCenterY+75*Math.sin(dRadians)),)
+        	myCenterX += 75*Math.cos(dRadians);
+        	myCenterY += 75*Math.sin(dRadians);
+        	warpPoint = 0;
         }
+    	if (warpPoint>=180)
+    	{
+    		warpPoint = 180;
+    	}else
+    	{
+    		warpPoint++;
+    	}
+
     }   
 }
 class Bullet extends Floater
