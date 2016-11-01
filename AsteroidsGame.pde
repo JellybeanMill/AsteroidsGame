@@ -28,6 +28,7 @@ public void draw()
 	shipMagellan.show();
 	shipMagellan.move();
 	shipMagellan.accelerate();
+	loadBar();
 }
 public void mousePressed()
 {
@@ -66,7 +67,12 @@ public void keyReleased()
 }
 public void loadBar()
 {
-
+	stroke(255);
+	fill(0);
+	rect(9,9,181,11);
+	noStroke();
+	fill(255);
+	rect(10,10,shipMagellan.getWarpPoint(),10);
 }
 class SpaceShip extends Floater  
 {
@@ -98,6 +104,7 @@ class SpaceShip extends Floater
     public double getDirectionY(){return myDirectionY;}
     public void setPointDirection(int degrees){myPointDirection = degrees;}
     public double getPointDirection(){return myPointDirection;}
+    public int getWarpPoint() {return warpPoint;}
     public void accelerate()
     {
       	if (keyW==true) {myDirectionY=-speedCont;}
@@ -141,9 +148,15 @@ class SpaceShip extends Floater
         if (keySpace == true&&warpPoint>=180)
         {
         	double dRadians =myPointDirection*(Math.PI/180);
-        	if (dist(myCenterX+(75*Math.cos(dRadians)),dist(myCenterY+75*Math.sin(dRadians)),)
-        	myCenterX += 75*Math.cos(dRadians);
-        	myCenterY += 75*Math.sin(dRadians);
+        	if (dist((int)(myCenterX+(75*Math.cos(dRadians))),(int)(myCenterY+(75*Math.sin(dRadians))),(int)myCenterX,(int)myCenterY)<dist(mouseX,mouseY,(int)myCenterX,(int)myCenterY))
+        	{
+        		myCenterX += 125*Math.cos(dRadians);
+        		myCenterY += 125*Math.sin(dRadians);
+			}else
+			{
+				myCenterX = mouseX;
+				myCenterY = mouseY;
+			}
         	warpPoint = 0;
         }
     	if (warpPoint>=180)
@@ -288,4 +301,3 @@ abstract class Floater //Do NOT modify the Floater class! Make changes in the Sp
     endShape(CLOSE);  
   }   
 } 
-
