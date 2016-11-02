@@ -226,6 +226,33 @@ class Bullet extends Floater
     	else {isDead =true;}
     }
 }
+class Asteroid extends Bullet
+{
+	int asteroidSize;
+	public Asteroid()
+	{
+		corners = ((int)(Math.random()*4)+1)*4;
+		xCorners = new int[corners];
+		yCorners = new int[corners];
+		asteroidSize = (int)(Math.random()*30)+20;
+	}
+	int [] xDotReturn()
+	{
+		int [] dotHoldBayN = new int [corners*0.5];
+		int [] dotHoldBayS = new int [corners*0.5];
+		int [] dotPassBayN = new int [corners*0.5];
+		int [] dotPassBayS = new int [corners*0.5];
+		for(int i=0;i<dotHoldBayN.length;i++)
+		{
+			dotHoldBayN[i] =(int)(Math.random()*asteroidSize)-(0.5*asteroidSize);
+			dotHoldBayS[i] =-((int)(Math.random()*asteroidSize)-(0.5*asteroidSize));
+		}
+		for(int h=0;h<dotHoldBayN.length;i++)
+		{
+			
+		}
+	}
+}
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
 {   
   protected int corners;  //the number of corners, a triangular floater has 3   
