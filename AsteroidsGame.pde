@@ -18,6 +18,7 @@ public void setup()
 public void draw() 
 {
 	background(0);
+	if (mousePressed == true){fireBullet();}
 	for (int i=0;i<bulletListLength;i++)
 	{
 		bulletList[i].move();
@@ -30,7 +31,7 @@ public void draw()
 	shipMagellan.accelerate();
 	loadBar();
 }
-public void mousePressed()
+public void fireBullet()
 {
 	int bulletNum=1024;
 	for(int i=0;i<bulletListLength;i++)
@@ -242,12 +243,12 @@ class Asteroid extends Bullet
 		int [] dotHoldBayS = new int [(int)(corners*0.5)];
 		int [] dotPassBayN = new int [(int)(corners*0.5)];
 		int [] dotPassBayS = new int [(int)(corners*0.5)];
-		int [] ignoreHold = new int [(int)(corners*0.5)];
 		for(int i=0;i<dotHoldBayN.length;i++)
 		{
 			dotHoldBayN[i] =(int)(Math.random()*asteroidSize)-(int)(0.5*asteroidSize);
 			dotHoldBayS[i] =-((int)(Math.random()*asteroidSize)-(int)(0.5*asteroidSize));
 		}
+		int [] ignoreHold = new int [(int)(corners*0.5)];
 		for(int h=0;h<dotHoldBayN.length;h++)
 		{
 			int nowBiggest = -50;
@@ -266,6 +267,30 @@ class Asteroid extends Bullet
 					if (ignore == false)
 					{
 						dotPassBayN[h] = dotHoldBayN[i];
+						ignoreHold[h] = i;
+					}
+				}
+			}
+		}
+		ignoreHold = new int [(int)(corners*0.5)];
+		for(int h=0;h<dotHoldBayS.length;h++)
+		{
+			int nowBiggest = -50;
+			boolean ignore = false;
+			for(int i=0;i<dotHoldBayS.length;i++)
+			{
+				if (dotHoldBayS[i]>nowBiggest)
+				{
+					for (int j=0;j<ignoreHold.length;j++)
+					{
+						if(i==ignoreHold[j])
+						{
+							ignore = true;
+						}
+					}
+					if (ignore == false)
+					{
+						dotPassBayS[h] = dotHoldBayS[i];
 						ignoreHold[h] = i;
 					}
 				}
