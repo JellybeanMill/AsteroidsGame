@@ -238,19 +238,40 @@ class Asteroid extends Bullet
 	}
 	int [] xDotReturn()
 	{
-		int [] dotHoldBayN = new int [corners*0.5];
-		int [] dotHoldBayS = new int [corners*0.5];
-		int [] dotPassBayN = new int [corners*0.5];
-		int [] dotPassBayS = new int [corners*0.5];
+		int [] dotHoldBayN = new int [(int)(corners*0.5)];
+		int [] dotHoldBayS = new int [(int)(corners*0.5)];
+		int [] dotPassBayN = new int [(int)(corners*0.5)];
+		int [] dotPassBayS = new int [(int)(corners*0.5)];
+		int [] ignoreHold = new int [(int)(corners*0.5)];
 		for(int i=0;i<dotHoldBayN.length;i++)
 		{
-			dotHoldBayN[i] =(int)(Math.random()*asteroidSize)-(0.5*asteroidSize);
-			dotHoldBayS[i] =-((int)(Math.random()*asteroidSize)-(0.5*asteroidSize));
+			dotHoldBayN[i] =(int)(Math.random()*asteroidSize)-(int)(0.5*asteroidSize);
+			dotHoldBayS[i] =-((int)(Math.random()*asteroidSize)-(int)(0.5*asteroidSize));
 		}
-		for(int h=0;h<dotHoldBayN.length;i++)
+		for(int h=0;h<dotHoldBayN.length;h++)
 		{
-			
+			int nowBiggest = -50;
+			boolean ignore = false;
+			for(int i=0;i<dotHoldBayN.length;i++)
+			{
+				if (dotHoldBayN[i]>nowBiggest)
+				{
+					for (int j=0;j<ignoreHold.length;j++)
+					{
+						if(i==ignoreHold[j])
+						{
+							ignore = true;
+						}
+					}
+					if (ignore == false)
+					{
+						dotPassBayN[h] = dotHoldBayN[i];
+						ignoreHold[h] = i;
+					}
+				}
+			}
 		}
+		return dotPassBayN;
 	}
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
