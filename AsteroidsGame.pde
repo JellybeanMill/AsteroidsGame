@@ -1,5 +1,6 @@
 SpaceShip shipMagellan;
 Bullet [] bulletList;
+Asteroid [] asteroidList;
 //input variables
 boolean keyW = false;
 boolean keyA = false;
@@ -9,21 +10,36 @@ boolean keySpace = false;
 //your variable declarations here
 float speedCont = 5;
 int bulletListLength = 0;
+int frameCounter = 0;
 public void setup() 
 {
 	size(1000,600);
 	shipMagellan = new SpaceShip();
 	bulletList = new Bullet[300];
+	asteroidList = new Asteroid[30];
+	for(int i =0;i<asteroidList.length;i++)
+	{
+		asteroidList[i] = new Asteroid();
+		asteroidList[i].accelerate();
+	}
 }
 public void draw() 
 {
 	background(0);
-	if (mousePressed == true){fireBullet();}
+	frameCounter++;
+	if (mousePressed == true&&frameCounter%6==0){fireBullet();}
+	if (frameCounter>=60){frameCounter=0;}
 	for (int i=0;i<bulletListLength;i++)
 	{
 		bulletList[i].move();
 		bulletList[i].rotate();
 		bulletList[i].show();
+	}
+	for (int i=0;i<asteroidList.length;i++)
+	{
+		asteroidList[i].move();
+		asteroidList[i].rotate();
+		asteroidList[i].show();
 	}
 	shipMagellan.rotate();
 	shipMagellan.show();
@@ -172,8 +188,8 @@ class SpaceShip extends Floater
 }
 class Bullet extends Floater
 {
-	private int fuelPoint;
-	private boolean isDead;
+	protected int fuelPoint;
+	protected boolean isDead;
 	public Bullet()
 	{
         corners = 8;
@@ -232,72 +248,68 @@ class Asteroid extends Bullet
 	int asteroidSize;
 	public Asteroid()
 	{
-		corners = ((int)(Math.random()*4)+1)*4;
+		corners = 8;
 		xCorners = new int[corners];
 		yCorners = new int[corners];
-		asteroidSize = (int)(Math.random()*30)+20;
+		xCorners[0] = (int)(Math.random()*20)+1;
+		yCorners[0] = (int)(Math.random()*20)+1;
+		xCorners[1] = (int)(Math.random()*20)+1;
+		yCorners[1] = (int)(Math.random()*20)+1;
+		xCorners[2] = (int)(Math.random()*20)-21;
+		yCorners[2] = (int)(Math.random()*20)+1;
+		xCorners[3] = (int)(Math.random()*20)-21;
+		yCorners[3] = (int)(Math.random()*20)+1;
+		xCorners[4] = (int)(Math.random()*20)-21;
+		yCorners[4] = (int)(Math.random()*20)-21;
+		xCorners[5] = (int)(Math.random()*20)-21;
+		yCorners[5] = (int)(Math.random()*20)-21;
+		xCorners[6] = (int)(Math.random()*20)+1;
+		yCorners[6] = (int)(Math.random()*20)-21;
+		xCorners[7] = (int)(Math.random()*20)+1;
+		yCorners[7] = (int)(Math.random()*20)-21;
+		myColor = color(255,0,0);
+		myPointDirection=0;
+		fuelPoint = (int)(Math.random()*30)+20;
+		isDead=false;
 	}
-	int [] xDotReturn()
-	{
-		int [] dotHoldBayN = new int [(int)(corners*0.5)];
-		int [] dotHoldBayS = new int [(int)(corners*0.5)];
-		int [] dotPassBayN = new int [(int)(corners*0.5)];
-		int [] dotPassBayS = new int [(int)(corners*0.5)];
-		for(int i=0;i<dotHoldBayN.length;i++)
-		{
-			dotHoldBayN[i] =(int)(Math.random()*asteroidSize)-(int)(0.5*asteroidSize);
-			dotHoldBayS[i] =-((int)(Math.random()*asteroidSize)-(int)(0.5*asteroidSize));
-		}
-		int [] ignoreHold = new int [(int)(corners*0.5)];
-		for(int h=0;h<dotHoldBayN.length;h++)
-		{
-			int nowBiggest = -50;
-			boolean ignore = false;
-			for(int i=0;i<dotHoldBayN.length;i++)
-			{
-				if (dotHoldBayN[i]>nowBiggest)
-				{
-					for (int j=0;j<ignoreHold.length;j++)
-					{
-						if(i==ignoreHold[j])
-						{
-							ignore = true;
-						}
-					}
-					if (ignore == false)
-					{
-						dotPassBayN[h] = dotHoldBayN[i];
-						ignoreHold[h] = i;
-					}
-				}
-			}
-		}
-		ignoreHold = new int [(int)(corners*0.5)];
-		for(int h=0;h<dotHoldBayS.length;h++)
-		{
-			int nowBiggest = -50;
-			boolean ignore = false;
-			for(int i=0;i<dotHoldBayS.length;i++)
-			{
-				if (dotHoldBayS[i]>nowBiggest)
-				{
-					for (int j=0;j<ignoreHold.length;j++)
-					{
-						if(i==ignoreHold[j])
-						{
-							ignore = true;
-						}
-					}
-					if (ignore == false)
-					{
-						dotPassBayS[h] = dotHoldBayS[i];
-						ignoreHold[h] = i;
-					}
-				}
-			}
-		}
-		return dotPassBayN;
-	}
+	public void accelerate()
+    {
+    	if(Math.random()>0.5)
+    	{
+    		if(Math.random()>0.5)
+    		{
+    			myCenterX=(int)(Math.random()*640)-19;
+    			myCenterY=-10;
+    		}else
+    		{
+    			myCenterX=(int)(Math.random()*640)-19;
+    			myCenterY=610;
+    		}
+    	}else 
+    	{
+    		if(Math.random()>0.5)
+    		{
+    			myCenterY=(int)(Math.random()*640)-19;
+    			myCenterX=-10;
+    		}else
+    		{
+    			myCenterY=(int)(Math.random()*640)-19;
+    			myCenterX=1010;
+    		}
+    	}
+		double dRadians =((int)(Math.random()*361))*(Math.PI/180);
+		myDirectionX = (speedCont*0.75 * Math.cos(dRadians));
+		myDirectionY = (speedCont*0.75 * Math.sin(dRadians));
+    }
+    public void move()
+    {
+    	myCenterX+=myDirectionX;
+    	myCenterY+=myDirectionY;
+    	if (myCenterX<-20) {myCenterX=width+20;}
+    	if (myCenterX>width+20) {myCenterX=-20;}
+    	if (myCenterY<-20) {myCenterY=width+20;}
+    	if (myCenterY>width+20) {myCenterY=-20;}
+    }
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
 {   
