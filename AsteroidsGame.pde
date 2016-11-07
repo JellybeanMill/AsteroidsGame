@@ -1,6 +1,6 @@
 SpaceShip shipMagellan;
 Bullet [] bulletList;
-Asteroid [] asteroidList;
+ArrayList <Asteroid> asteroidList = new ArrayList <Asteroid>();
 //input variables
 boolean keyW = false;
 boolean keyA = false;
@@ -16,18 +16,17 @@ public void setup()
 	size(1000,600);
 	shipMagellan = new SpaceShip();
 	bulletList = new Bullet[300];
-	asteroidList = new Asteroid[30];
-	for(int i =0;i<asteroidList.length;i++)
+	for(int i =0;i<30;i++)
 	{
-		asteroidList[i] = new Asteroid();
-		asteroidList[i].accelerate();
+		asteroidList.add(new Asteroid());
+		asteroidList.get(i).accelerate();
 	}
 }
 public void draw() 
 {
 	background(0);
 	frameCounter++;
-	if (mousePressed == true&&frameCounter%6==0){fireBullet();}
+	if (mousePressed == true&&frameCounter%3==0){fireBullet();}
 	if (frameCounter>=60){frameCounter=0;}
 	for (int i=0;i<bulletListLength;i++)
 	{
@@ -35,11 +34,11 @@ public void draw()
 		bulletList[i].rotate();
 		bulletList[i].show();
 	}
-	for (int i=0;i<asteroidList.length;i++)
+	for (int i=0;i<asteroidList.size();i++)
 	{
-		asteroidList[i].move();
-		asteroidList[i].rotate();
-		asteroidList[i].show();
+		asteroidList.get(i).move();
+		asteroidList.get(i).rotate();
+		asteroidList.get(i).show();
 	}
 	shipMagellan.rotate();
 	shipMagellan.show();
@@ -90,6 +89,19 @@ public void loadBar()
 	noStroke();
 	fill(255);
 	rect(10,10,shipMagellan.getWarpPoint(),10);
+}
+public void killAsteroid()
+{
+	for (int loop1=0;loop1<bulletListLength;loop1++)
+	{
+		for (int loop2=0;loop2<asteroidList.size();loop2++)
+		{
+			if (dist(bulletList[loop1].getX(),bulletList[loop1].getY(),asteroidList.get(loop2).getX(),asteroidList.get(loop2).getX())<=20)
+			{
+
+			}
+		}
+	}
 }
 class SpaceShip extends Floater  
 {
@@ -199,7 +211,7 @@ class Bullet extends Floater
         int [] yCornersTemp = {3,1,0,-1,-3,-1, 0, 1};
         xCorners = xCornersTemp;
         yCorners = yCornersTemp;
-        myColor = color(0,0,255);
+        myColor = color(0,255,0);
         myCenterX = shipMagellan.getX();
         myCenterY = shipMagellan.getY();
         myDirectionX = 0;
@@ -239,13 +251,12 @@ class Bullet extends Floater
     	if (myCenterY<-20) {myCenterY=width+20;}
     	if (myCenterY>width+20) {myCenterY=-20;}
     	fuelPoint-=1;
-    	if (fuelPoint >=0) {myColor = color(0,0,fuelPoint);}
+    	if (fuelPoint >=0) {myColor = color(0,fuelPoint,0);}
     	else {isDead =true;}
     }
 }
 class Asteroid extends Bullet
 {
-	int asteroidSize;
 	public Asteroid()
 	{
 		corners = 8;
