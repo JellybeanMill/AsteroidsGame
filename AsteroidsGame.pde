@@ -26,25 +26,32 @@ public void draw()
 {
 	background(0);
 	frameCounter++;
-	if (mousePressed == true&&frameCounter%3==0){fireBullet();}
+	if (mousePressed == true&&frameCounter%10==0){fireBullet();}
 	if (frameCounter>=60){frameCounter=0;}
 	for (int i=0;i<bulletListLength;i++)
 	{
 		bulletList[i].move();
 		bulletList[i].rotate();
-		bulletList[i].show();
+		if (bulletList[i].getDead()==false)
+		{
+			bulletList[i].show();
+		}
 	}
 	for (int i=0;i<asteroidList.size();i++)
 	{
 		asteroidList.get(i).move();
 		asteroidList.get(i).rotate();
-		asteroidList.get(i).show();
+		if (asteroidList.get(i).getDead()==false)
+		{
+			asteroidList.get(i).show();
+		}
 	}
 	shipMagellan.rotate();
 	shipMagellan.show();
 	shipMagellan.move();
 	shipMagellan.accelerate();
 	loadBar();
+	hitSomething();
 }
 public void fireBullet()
 {
@@ -90,15 +97,23 @@ public void loadBar()
 	fill(255);
 	rect(10,10,shipMagellan.getWarpPoint(),10);
 }
-public void killAsteroid()
+public void hitSomething()
 {
 	for (int loop1=0;loop1<bulletListLength;loop1++)
 	{
 		for (int loop2=0;loop2<asteroidList.size();loop2++)
 		{
-			if (dist(bulletList[loop1].getX(),bulletList[loop1].getY(),asteroidList.get(loop2).getX(),asteroidList.get(loop2).getX())<=20)
+			if (dist(bulletList[loop1].getX(),bulletList[loop1].getY(),asteroidList.get(loop2).getX(),asteroidList.get(loop2).getX())<=15)
 			{
-
+				if(bulletList[loop1].getFuel()/10<asteroidList.get(loop2).getFuel())
+				{
+					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()*0.1)));
+					bulletList[loop1].setFuel(0);
+				}else
+				{
+					bulletList[loop1].setFuel(bulletList[loop1].getFuel()-(asteroidList.get(loop2).getFuel()*10));
+					asteroidList.get(loop2).setFuel(0);
+				}
 			}
 		}
 	}
@@ -231,6 +246,8 @@ class Bullet extends Floater
     public void setPointDirection(int degrees){myPointDirection = degrees;}
     public double getPointDirection(){return myPointDirection;}
     public boolean getDead() {return isDead;}
+    public int getFuel() {return fuelPoint;}
+    public void setFuel(int inputFuel) {fuelPoint = inputFuel;}
     public void rotate()
     {
     	myPointDirection += 1;
@@ -280,7 +297,7 @@ class Asteroid extends Bullet
 		yCorners[7] = (int)(Math.random()*20)-21;
 		myColor = color(255,0,0);
 		myPointDirection=0;
-		fuelPoint = (int)(Math.random()*30)+20;
+		fuelPoint = 225;
 		isDead=false;
 	}
 	public void accelerate()
@@ -320,6 +337,13 @@ class Asteroid extends Bullet
     	if (myCenterX>width+20) {myCenterX=-20;}
     	if (myCenterY<-20) {myCenterY=width+20;}
     	if (myCenterY>width+20) {myCenterY=-20;}
+    	if (fuelPoint<=0)
+    	{
+    		isDead=true;
+    	}else 
+    	{
+			myColor = color(fuelPoint,255-fuelPoint,0);
+    	}
     }
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
