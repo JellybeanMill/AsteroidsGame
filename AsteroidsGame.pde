@@ -11,6 +11,9 @@ boolean keySpace = false;
 float speedCont = 5;
 int bulletListLength = 0;
 int frameCounter = 0;
+int bulletMax = 90;
+int bulletStorage = bulletMax;
+int bulletStatus = color(0,255,0);
 public void setup() 
 {
 	size(1000,600);
@@ -26,7 +29,9 @@ public void draw()
 {
 	background(0);
 	frameCounter++;
-	if (mousePressed == true&&frameCounter%10==0){fireBullet();}
+	if (mousePressed==true&&frameCounter%6==0){fireBullet();}
+	if(frameCounter%15==0&&bulletStorage<bulletMax&&(mousePressed==false||bulletStatus==color(255,0,0))){bulletStorage++;}
+	if(bulletStorage>=0.25*bulletMax) {bulletStatus=color(0,255,0);}
 	if (frameCounter>=60){frameCounter=0;}
 	for (int i=0;i<bulletListLength;i++)
 	{
@@ -60,16 +65,22 @@ public void fireBullet()
 	{
 		if(bulletList[i].getDead()==true) {bulletNum = i;}
 	}
-	if (bulletNum!=1024)
+	if (bulletNum!=1024&&bulletStorage>0&&bulletStatus==color(0,255,0))
 	{
 		bulletList[bulletNum] = new Bullet();
 		bulletList[bulletNum].accelerate();
+		bulletStorage-=1;
 	}
-	else
+	else if(bulletStorage>0&&bulletStatus==color(0,255,0))
 	{
 		bulletList[bulletListLength] = new Bullet();
 		bulletList[bulletListLength].accelerate();
 		bulletListLength+=1;
+		bulletStorage-=1;
+	}
+	else
+	{
+		bulletStatus = color(255,0,0);
 	}
 }
 public void keyPressed()
@@ -93,9 +104,13 @@ public void loadBar()
 	stroke(255);
 	fill(0);
 	rect(9,9,181,11);
+	stroke(bulletStatus);
+	rect(9,24,181,11);
 	noStroke();
 	fill(255);
 	rect(10,10,shipMagellan.getWarpPoint(),10);
+	fill(bulletStatus);
+	rect(10,25,bulletStorage*2,10);
 }
 public void hitSomething()
 {
@@ -103,16 +118,17 @@ public void hitSomething()
 	{
 		for (int loop2=0;loop2<asteroidList.size();loop2++)
 		{
-			if (dist(bulletList[loop1].getX(),bulletList[loop1].getY(),asteroidList.get(loop2).getX(),asteroidList.get(loop2).getX())<=15)
+			if (dist(bulletList[loop1].getX(),bulletList[loop1].getY(),asteroidList.get(loop2).getX(),asteroidList.get(loop2).getY())<=10)
 			{
 				if(bulletList[loop1].getFuel()/10<asteroidList.get(loop2).getFuel())
 				{
-					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()*0.1)));
+					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()/4)));
 					bulletList[loop1].setFuel(0);
 				}else
 				{
-					bulletList[loop1].setFuel(bulletList[loop1].getFuel()-(asteroidList.get(loop2).getFuel()*10));
+					bulletList[loop1].setFuel(bulletList[loop1].getFuel()-(asteroidList.get(loop2).getFuel()*4));
 					asteroidList.get(loop2).setFuel(0);
+					asteroidList.get(loop2).setDead(true);
 				}
 			}
 		}
@@ -256,8 +272,8 @@ class Bullet extends Floater
     public void accelerate()
     {
     	double dRadians =shipMagellan.getPointDirection()*(Math.PI/180);
-    	myDirectionX = (speedCont*1.25 * Math.cos(dRadians));
-    	myDirectionY = (speedCont*1.25 * Math.sin(dRadians));
+    	myDirectionX = (speedCont*2.5 * Math.cos(dRadians));
+    	myDirectionY = (speedCont*2.5 * Math.sin(dRadians));
     }
     public void move()
     {
@@ -279,27 +295,28 @@ class Asteroid extends Bullet
 		corners = 8;
 		xCorners = new int[corners];
 		yCorners = new int[corners];
-		xCorners[0] = (int)(Math.random()*20)+1;
-		yCorners[0] = (int)(Math.random()*20)+1;
-		xCorners[1] = (int)(Math.random()*20)+1;
-		yCorners[1] = (int)(Math.random()*20)+1;
-		xCorners[2] = (int)(Math.random()*20)-21;
-		yCorners[2] = (int)(Math.random()*20)+1;
-		xCorners[3] = (int)(Math.random()*20)-21;
-		yCorners[3] = (int)(Math.random()*20)+1;
-		xCorners[4] = (int)(Math.random()*20)-21;
-		yCorners[4] = (int)(Math.random()*20)-21;
-		xCorners[5] = (int)(Math.random()*20)-21;
-		yCorners[5] = (int)(Math.random()*20)-21;
-		xCorners[6] = (int)(Math.random()*20)+1;
-		yCorners[6] = (int)(Math.random()*20)-21;
-		xCorners[7] = (int)(Math.random()*20)+1;
-		yCorners[7] = (int)(Math.random()*20)-21;
+		xCorners[0] = 10;//(int)(Math.random()*20)+1;
+		yCorners[0] = 0;//(int)(Math.random()*20)+1;
+		xCorners[1] = 10;//(int)(Math.random()*20)+1;
+		yCorners[1] = 10;//(int)(Math.random()*20)+1;
+		xCorners[2] = 0;//(int)(Math.random()*20)-21;
+		yCorners[2] = 10;//(int)(Math.random()*20)+1;
+		xCorners[3] = -10;//(int)(Math.random()*20)-21;
+		yCorners[3] = 10;//(int)(Math.random()*20)+1;
+		xCorners[4] = -10;//(int)(Math.random()*20)-21;
+		yCorners[4] = 0;//(int)(Math.random()*20)-21;
+		xCorners[5] = -10;//(int)(Math.random()*20)-21;
+		yCorners[5] = -10;//(int)(Math.random()*20)-21;
+		xCorners[6] = 0;//(int)(Math.random()*20)+1;
+		yCorners[6] = -10;//(int)(Math.random()*20)-21;
+		xCorners[7] = 10;//(int)(Math.random()*20)+1;
+		yCorners[7] = -10;//(int)(Math.random()*20)-21;
 		myColor = color(255,0,0);
 		myPointDirection=0;
 		fuelPoint = 225;
 		isDead=false;
 	}
+	public void setDead (boolean inputDead){isDead=inputDead;}
 	public void accelerate()
     {
     	if(Math.random()>0.5)
@@ -326,8 +343,8 @@ class Asteroid extends Bullet
     		}
     	}
 		double dRadians =((int)(Math.random()*361))*(Math.PI/180);
-		myDirectionX = (speedCont*0.75 * Math.cos(dRadians));
-		myDirectionY = (speedCont*0.75 * Math.sin(dRadians));
+		myDirectionX = (speedCont*0.5 * Math.cos(dRadians));
+		myDirectionY = (speedCont*0.5 * Math.sin(dRadians));
     }
     public void move()
     {
@@ -342,7 +359,7 @@ class Asteroid extends Bullet
     		isDead=true;
     	}else 
     	{
-			myColor = color(fuelPoint,255-fuelPoint,0);
+			myColor = color(255,255-fuelPoint,0);
     	}
     }
 }
