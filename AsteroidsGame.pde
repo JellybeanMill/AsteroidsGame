@@ -30,8 +30,8 @@ public void draw()
 	background(0);
 	frameCounter++;
 	if (mousePressed==true&&frameCounter%6==0){fireBullet();}
-	if(frameCounter%15==0&&bulletStorage<bulletMax&&(mousePressed==false||bulletStatus==color(255,0,0))){bulletStorage++;}
-	if(bulletStorage>=0.25*bulletMax) {bulletStatus=color(0,255,0);}
+	if(frameCounter%2==0&&bulletStorage<bulletMax&&(mousePressed==false||bulletStatus==color(255,0,0))){bulletStorage++;}
+	if(bulletStorage>=bulletMax) {bulletStatus=color(0,255,0);}
 	if (frameCounter>=60){frameCounter=0;}
 	for (int i=0;i<bulletListLength;i++)
 	{
@@ -122,11 +122,12 @@ public void hitSomething()
 			{
 				if(bulletList[loop1].getFuel()/10<asteroidList.get(loop2).getFuel())
 				{
-					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()/4)));
+					println(bulletStorage);
+					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()/5)));
 					bulletList[loop1].setFuel(0);
 				}else
 				{
-					bulletList[loop1].setFuel(bulletList[loop1].getFuel()-(asteroidList.get(loop2).getFuel()*4));
+					bulletList[loop1].setFuel(bulletList[loop1].getFuel()-(asteroidList.get(loop2).getFuel()*5));
 					asteroidList.get(loop2).setFuel(0);
 					asteroidList.get(loop2).setDead(true);
 				}
@@ -187,24 +188,12 @@ class SpaceShip extends Floater
     public void rotate(){myPointDirection=((-Math.atan2(mouseX-myCenterX, mouseY-myCenterY))*180/PI)+90;}
     public void move ()
     {   
-    	myCenterX += myDirectionX;    
+    	myCenterX += myDirectionX;
         myCenterY += myDirectionY;
-        if(myCenterX >width+20)
-        {     
-            myCenterX = 0;    
-        }    
-        else if (myCenterX<-20)
-        {     
-            myCenterX = width;    
-        }    
-        if(myCenterY >height+20)
-        {    
-            myCenterY = 0;    
-        }   
-        else if (myCenterY < -20)
-        {     
-    		myCenterY = height;
-        }
+        if(myCenterX>width-20) {myCenterX = width-20;}    
+        else if(myCenterX<20){myCenterX = 20;}    
+        if(myCenterY>height-20){myCenterY = height-20;}   
+        else if (myCenterY<20){myCenterY = 20;}
         if (keySpace == true&&warpPoint>=180)
         {
         	double dRadians =myPointDirection*(Math.PI/180);
@@ -279,10 +268,10 @@ class Bullet extends Floater
     {
     	myCenterX+=myDirectionX;
     	myCenterY+=myDirectionY;
-    	if (myCenterX<-20) {myCenterX=width+20;}
-    	if (myCenterX>width+20) {myCenterX=-20;}
-    	if (myCenterY<-20) {myCenterY=width+20;}
-    	if (myCenterY>width+20) {myCenterY=-20;}
+    	if (myCenterX<-20) {isDead=true;}
+    	if (myCenterX>width+20) {isDead=true;}
+    	if (myCenterY<-20) {isDead=true;}
+    	if (myCenterY>height+20) {isDead=true;}
     	fuelPoint-=1;
     	if (fuelPoint >=0) {myColor = color(0,fuelPoint,0);}
     	else {isDead =true;}
@@ -351,9 +340,9 @@ class Asteroid extends Bullet
     	myCenterX+=myDirectionX;
     	myCenterY+=myDirectionY;
     	if (myCenterX<-20) {myCenterX=width+20;}
-    	if (myCenterX>width+20) {myCenterX=-20;}
+    	else if (myCenterX>width+20) {myCenterX=-20;}
     	if (myCenterY<-20) {myCenterY=width+20;}
-    	if (myCenterY>width+20) {myCenterY=-20;}
+    	else if (myCenterY>width+20) {myCenterY=-20;}
     	if (fuelPoint<=0)
     	{
     		isDead=true;
