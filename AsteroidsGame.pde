@@ -11,9 +11,7 @@ boolean keySpace = false;
 float speedCont = 5;
 int bulletListLength = 0;
 int frameCounter = 0;
-int bulletMax = 90;
-int bulletStorage = bulletMax;
-int bulletStatus = color(0,255,0);
+int shipHealth = 10;
 public void setup() 
 {
 	size(1000,600);
@@ -30,8 +28,6 @@ public void draw()
 	background(0);
 	frameCounter++;
 	if (mousePressed==true&&frameCounter%6==0){fireBullet();}
-	if(frameCounter%2==0&&bulletStorage<bulletMax&&(mousePressed==false||bulletStatus==color(255,0,0))){bulletStorage++;}
-	if(bulletStorage>=bulletMax) {bulletStatus=color(0,255,0);}
 	if (frameCounter>=60){frameCounter=0;}
 	for (int i=0;i<bulletListLength;i++)
 	{
@@ -65,22 +61,16 @@ public void fireBullet()
 	{
 		if(bulletList[i].getDead()==true) {bulletNum = i;}
 	}
-	if (bulletNum!=1024&&bulletStorage>0&&bulletStatus==color(0,255,0))
+	if (bulletNum!=1024)
 	{
 		bulletList[bulletNum] = new Bullet();
 		bulletList[bulletNum].accelerate();
-		bulletStorage-=1;
 	}
-	else if(bulletStorage>0&&bulletStatus==color(0,255,0))
+	else 
 	{
 		bulletList[bulletListLength] = new Bullet();
 		bulletList[bulletListLength].accelerate();
 		bulletListLength+=1;
-		bulletStorage-=1;
-	}
-	else
-	{
-		bulletStatus = color(255,0,0);
 	}
 }
 public void keyPressed()
@@ -101,16 +91,16 @@ public void keyReleased()
 }
 public void loadBar()
 {
-	stroke(255);
-	fill(0);
-	rect(9,9,181,11);
-	stroke(bulletStatus);
+	stroke(0,0,255);
+	noFill();
 	rect(9,24,181,11);
+	stroke(255);
+	rect(9,9,181,11);
 	noStroke();
+	fill(0,0,255);
+	rect(10,25,shipMagellan.getWarpPoint(),10);
 	fill(255);
-	rect(10,10,shipMagellan.getWarpPoint(),10);
-	fill(bulletStatus);
-	rect(10,25,bulletStorage*2,10);
+	rect(10,10,shipHealth*18,10);
 }
 public void hitSomething()
 {
@@ -122,7 +112,6 @@ public void hitSomething()
 			{
 				if(bulletList[loop1].getFuel()/10<asteroidList.get(loop2).getFuel())
 				{
-					println(bulletStorage);
 					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()/5)));
 					bulletList[loop1].setFuel(0);
 				}else
@@ -132,6 +121,14 @@ public void hitSomething()
 					asteroidList.get(loop2).setDead(true);
 				}
 			}
+		}
+	}
+	for (int loop1=0;loop1<asteroidList.size();loop1++)
+	{
+		if(dist(asteroidList.get(loop1).getX(),asteroidList.get(loop1).getY(),shipMagellan.getX(),shipMagellan.getY())<=22&&asteroidList.get(loop1).getDead()==false)
+		{
+			shipHealth--;
+			asteroidList.get(loop1).setFuel(0);
 		}
 	}
 }
