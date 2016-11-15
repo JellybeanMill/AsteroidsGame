@@ -19,7 +19,7 @@ public void setup()
 	bulletList = new Bullet[300];
 	for(int i =0;i<30;i++)
 	{
-		asteroidList.add(new Asteroid());
+		asteroidList.add(new Asteroid(4));
 		asteroidList.get(i).accelerate();
 	}
 }
@@ -93,14 +93,14 @@ public void loadBar()
 {
 	stroke(0,0,255);
 	noFill();
-	rect(9,24,181,11);
+	rect(810,579,181,11);
 	stroke(255);
-	rect(9,9,181,11);
+	rect(9,579,181,11);
 	noStroke();
 	fill(0,0,255);
-	rect(10,25,shipMagellan.getWarpPoint(),10);
+	rect(811,580,shipMagellan.getWarpPoint(),10);
 	fill(255);
-	rect(10,10,shipHealth*18,10);
+	rect(10,580,shipHealth*18,10);
 }
 public void hitSomething()
 {
@@ -276,27 +276,29 @@ class Bullet extends Floater
 }
 class Asteroid extends Bullet
 {
-	public Asteroid()
+	int astdSize;
+	public Asteroid(int inputSize)
 	{
 		corners = 8;
+		astdSize = inputSize;
 		xCorners = new int[corners];
 		yCorners = new int[corners];
-		xCorners[0] = 10;//(int)(Math.random()*20)+1;
-		yCorners[0] = 0;//(int)(Math.random()*20)+1;
-		xCorners[1] = 10;//(int)(Math.random()*20)+1;
-		yCorners[1] = 10;//(int)(Math.random()*20)+1;
-		xCorners[2] = 0;//(int)(Math.random()*20)-21;
-		yCorners[2] = 10;//(int)(Math.random()*20)+1;
-		xCorners[3] = -10;//(int)(Math.random()*20)-21;
-		yCorners[3] = 10;//(int)(Math.random()*20)+1;
-		xCorners[4] = -10;//(int)(Math.random()*20)-21;
-		yCorners[4] = 0;//(int)(Math.random()*20)-21;
-		xCorners[5] = -10;//(int)(Math.random()*20)-21;
-		yCorners[5] = -10;//(int)(Math.random()*20)-21;
-		xCorners[6] = 0;//(int)(Math.random()*20)+1;
-		yCorners[6] = -10;//(int)(Math.random()*20)-21;
-		xCorners[7] = 10;//(int)(Math.random()*20)+1;
-		yCorners[7] = -10;//(int)(Math.random()*20)-21;
+		xCorners[0] = astdSize*15;
+		yCorners[0] = 0;
+		xCorners[1] = astdSize*10;
+		yCorners[1] = astdSize*10;
+		xCorners[2] = 0;
+		yCorners[2] = astdSize*15;
+		xCorners[3] = astdSize*-10;
+		yCorners[3] = astdSize*10;
+		xCorners[4] = astdSize*-15;
+		yCorners[4] = 0;
+		xCorners[5] = astdSize*-10;
+		yCorners[5] = astdSize*-10;
+		xCorners[6] = 0;
+		yCorners[6] = astdSize*-15;
+		xCorners[7] = astdSize*10;
+		yCorners[7] = astdSize*-10;
 		myColor = color(255,0,0);
 		myPointDirection=0;
 		fuelPoint = 225;
