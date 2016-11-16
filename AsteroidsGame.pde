@@ -17,9 +17,9 @@ public void setup()
 	size(1000,600);
 	shipMagellan = new SpaceShip();
 	bulletList = new Bullet[300];
-	for(int i =0;i<30;i++)
+	for(int i =0;i<5;i++)
 	{
-		asteroidList.add(new Asteroid(4));
+		asteroidList.add(new Asteroid(4,(int)(Math.random()*1360)-180,-80));
 		asteroidList.get(i).accelerate();
 	}
 }
@@ -53,6 +53,7 @@ public void draw()
 	shipMagellan.accelerate();
 	loadBar();
 	hitSomething();
+	destroyAsteroids();
 }
 public void fireBullet()
 {
@@ -108,7 +109,7 @@ public void hitSomething()
 	{
 		for (int loop2=0;loop2<asteroidList.size();loop2++)
 		{
-			if (dist(bulletList[loop1].getX(),bulletList[loop1].getY(),asteroidList.get(loop2).getX(),asteroidList.get(loop2).getY())<=10)
+			if (dist(bulletList[loop1].getX(),bulletList[loop1].getY(),asteroidList.get(loop2).getX(),asteroidList.get(loop2).getY())<=(asteroidList.get(loop2).getSize()*15))
 			{
 				if(bulletList[loop1].getFuel()/10<asteroidList.get(loop2).getFuel())
 				{
@@ -117,18 +118,27 @@ public void hitSomething()
 				}else
 				{
 					bulletList[loop1].setFuel(bulletList[loop1].getFuel()-(asteroidList.get(loop2).getFuel()*5));
-					asteroidList.get(loop2).setFuel(0);
-					asteroidList.get(loop2).setDead(true);
-				}
+					asteroidList.get(loop2).setFuel(0);				}
 			}
 		}
 	}
 	for (int loop1=0;loop1<asteroidList.size();loop1++)
 	{
-		if(dist(asteroidList.get(loop1).getX(),asteroidList.get(loop1).getY(),shipMagellan.getX(),shipMagellan.getY())<=22&&asteroidList.get(loop1).getDead()==false)
+		if(dist(asteroidList.get(loop1).getX(),asteroidList.get(loop1).getY(),shipMagellan.getX(),shipMagellan.getY())<=(asteroidList.get(loop1).getSize()*13)+8&&asteroidList.get(loop1).getDead()==false)
 		{
 			shipHealth--;
 			asteroidList.get(loop1).setFuel(0);
+		}
+	}
+}
+public void destroyAsteroids()
+{
+	for(int lp1=0;lp1<asteroidList.size();lp1++)
+	{
+		if(asteroidList.get(lp1).getDead()==true)
+		{
+			asteroidList.remove(lp1);
+			lp1--;
 		}
 	}
 }
@@ -277,7 +287,7 @@ class Bullet extends Floater
 class Asteroid extends Bullet
 {
 	int astdSize;
-	public Asteroid(int inputSize)
+	public Asteroid(int inputSize, double inputX, double inputY)
 	{
 		corners = 8;
 		astdSize = inputSize;
@@ -299,37 +309,18 @@ class Asteroid extends Bullet
 		yCorners[6] = astdSize*-15;
 		xCorners[7] = astdSize*10;
 		yCorners[7] = astdSize*-10;
+		myCenterX = inputX;
+		myCenterY = inputY;
 		myColor = color(255,0,0);
 		myPointDirection=0;
 		fuelPoint = 225;
 		isDead=false;
 	}
+	public void setSize(int inputSize){astdSize=inputSize;}
+	public int getSize() {return astdSize;}
 	public void setDead (boolean inputDead){isDead=inputDead;}
 	public void accelerate()
     {
-    	if(Math.random()>0.5)
-    	{
-    		if(Math.random()>0.5)
-    		{
-    			myCenterX=(int)(Math.random()*640)-19;
-    			myCenterY=-10;
-    		}else
-    		{
-    			myCenterX=(int)(Math.random()*640)-19;
-    			myCenterY=610;
-    		}
-    	}else 
-    	{
-    		if(Math.random()>0.5)
-    		{
-    			myCenterY=(int)(Math.random()*640)-19;
-    			myCenterX=-10;
-    		}else
-    		{
-    			myCenterY=(int)(Math.random()*640)-19;
-    			myCenterX=1010;
-    		}
-    	}
 		double dRadians =((int)(Math.random()*361))*(Math.PI/180);
 		myDirectionX = (speedCont*0.5 * Math.cos(dRadians));
 		myDirectionY = (speedCont*0.5 * Math.sin(dRadians));
@@ -345,10 +336,17 @@ class Asteroid extends Bullet
     	if (fuelPoint<=0)
     	{
     		isDead=true;
-    	}else 
-    	{
-			myColor = color(255,255-fuelPoint,0);
+    		println("Started");
+    		if(astdSize>1)
+    		{
+    			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY));
+    			asteroidList.get(asteroidList.size()-1).accelerate();
+    			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY));
+    			asteroidList.get(asteroidList.size()-1).accelerate();
+    			println("Created");
+    		}
     	}
+    	else{myColor = color(255,255-fuelPoint,0);}
     }
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
