@@ -28,7 +28,8 @@ public void draw()
 	background(0);
 	frameCounter++;
 	if (mousePressed==true&&frameCounter%6==0){fireBullet();}
-	if (frameCounter>=60){frameCounter=0;}
+	if (frameCounter%300==0){generateAsteroids();}
+	if (frameCounter>=600){frameCounter=0;}
 	for (int i=0;i<bulletListLength;i++)
 	{
 		bulletList[i].move();
@@ -130,6 +131,10 @@ public void hitSomething()
 			asteroidList.get(loop1).setFuel(0);
 		}
 	}
+}
+public void generateAsteroids()
+{
+	if(asteroidList.size()<30){asteroidList.add(new Asteroid(4,(int)(Math.random()*1160),-80));}
 }
 public void destroyAsteroids()
 {
@@ -268,8 +273,8 @@ class Bullet extends Floater
     public void accelerate()
     {
     	double dRadians =shipMagellan.getPointDirection()*(Math.PI/180);
-    	myDirectionX = (speedCont*2.5 * Math.cos(dRadians));
-    	myDirectionY = (speedCont*2.5 * Math.sin(dRadians));
+    	myDirectionX = (speedCont*5 * Math.cos(dRadians));
+    	myDirectionY = (speedCont*5 * Math.sin(dRadians));
     }
     public void move()
     {
@@ -336,14 +341,12 @@ class Asteroid extends Bullet
     	if (fuelPoint<=0)
     	{
     		isDead=true;
-    		println("Started");
     		if(astdSize>1)
     		{
     			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY));
     			asteroidList.get(asteroidList.size()-1).accelerate();
     			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY));
     			asteroidList.get(asteroidList.size()-1).accelerate();
-    			println("Created");
     		}
     	}
     	else{myColor = color(255,255-fuelPoint,0);}
