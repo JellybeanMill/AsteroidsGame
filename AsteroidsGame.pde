@@ -11,7 +11,7 @@ boolean keySpace = false;
 float speedCont = 5;
 int bulletListLength = 0;
 int frameCounter = 0;
-int shipHealth = 10;
+int shipHealth = 100;
 public void setup() 
 {
 	size(1000,600);
@@ -20,7 +20,6 @@ public void setup()
 	for(int i =0;i<5;i++)
 	{
 		asteroidList.add(new Asteroid(4,(int)(Math.random()*1360)-180,-80));
-		asteroidList.get(i).accelerate();
 	}
 }
 public void draw() 
@@ -28,7 +27,7 @@ public void draw()
 	background(0);
 	frameCounter++;
 	if (mousePressed==true&&frameCounter%6==0){fireBullet();}
-	if (frameCounter%300==0){generateAsteroids();}
+	if (frameCounter%100==0){generateAsteroids();}
 	if (frameCounter>=600){frameCounter=0;}
 	for (int i=0;i<bulletListLength;i++)
 	{
@@ -102,7 +101,7 @@ public void loadBar()
 	fill(0,0,255);
 	rect(811,580,shipMagellan.getWarpPoint(),10);
 	fill(255);
-	rect(10,580,shipHealth*18,10);
+	rect(10,580,(int)(shipHealth*1.8),10);
 }
 public void hitSomething()
 {
@@ -127,14 +126,16 @@ public void hitSomething()
 	{
 		if(dist(asteroidList.get(loop1).getX(),asteroidList.get(loop1).getY(),shipMagellan.getX(),shipMagellan.getY())<=(asteroidList.get(loop1).getSize()*13)+8&&asteroidList.get(loop1).getDead()==false)
 		{
-			shipHealth--;
+			shipHealth-=asteroidList.get(loop1).getSize();
 			asteroidList.get(loop1).setFuel(0);
 		}
 	}
 }
 public void generateAsteroids()
 {
-	if(asteroidList.size()<30){asteroidList.add(new Asteroid(4,(int)(Math.random()*1160),-80));}
+	int [] astdSizeCount = new int[4];
+	for (int lp1=0;lp1<asteroidList.size();lp1++){astdSizeCount[asteroidList.get(lp1).getSize()-1]++;}
+	if(astdSizeCount[0]<=4&&astdSizeCount[1]<=8&&astdSizeCount[2]<=12&&astdSizeCount[3]<=16&&asteroidList.size()<=30){asteroidList.add(new Asteroid(4,(int)(Math.random()*1160),-80));}
 }
 public void destroyAsteroids()
 {
@@ -320,6 +321,7 @@ class Asteroid extends Bullet
 		myPointDirection=0;
 		fuelPoint = 225;
 		isDead=false;
+		accelerate();
 	}
 	public void setSize(int inputSize){astdSize=inputSize;}
 	public int getSize() {return astdSize;}
@@ -334,19 +336,17 @@ class Asteroid extends Bullet
     {
     	myCenterX+=myDirectionX;
     	myCenterY+=myDirectionY;
-    	if (myCenterX<-20) {myCenterX=width+20;}
-    	else if (myCenterX>width+20) {myCenterX=-20;}
-    	if (myCenterY<-20) {myCenterY=width+20;}
-    	else if (myCenterY>width+20) {myCenterY=-20;}
+    	if (myCenterX<-20) {myCenterX=width+15;}
+    	else if (myCenterX>width+20) {myCenterX=-15;}
+    	if (myCenterY<-20) {myCenterY=width+15;}
+    	else if (myCenterY>width+20) {myCenterY=-15;}
     	if (fuelPoint<=0)
     	{
     		isDead=true;
     		if(astdSize>1)
     		{
     			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY));
-    			asteroidList.get(asteroidList.size()-1).accelerate();
     			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY));
-    			asteroidList.get(asteroidList.size()-1).accelerate();
     		}
     	}
     	else{myColor = color(255,255-fuelPoint,0);}
