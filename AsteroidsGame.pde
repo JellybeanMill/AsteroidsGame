@@ -12,6 +12,8 @@ float speedCont = 5;
 int bulletListLength = 0;
 int frameCounter = 0;
 int shipHealth = 100;
+//SCREENS
+boolean cancerBossScreen = true;
 public void setup() 
 {
 	size(1000,600);
@@ -24,10 +26,32 @@ public void setup()
 }
 public void draw() 
 {
+	if(cancerBossScreen == true)
+	{
+		cancerBossDraw();
+	}
+}
+public void cancerBossDraw()
+{
 	background(0);
+	shipMove();
+	if (frameCounter%100==0){generateAsteroids();}
+	for (int i=0;i<asteroidList.size();i++)
+	{
+		asteroidList.get(i).move();
+		asteroidList.get(i).rotate();
+		if (asteroidList.get(i).getDead()==false)
+		{
+			asteroidList.get(i).show();
+		}
+	}
+	hitSomethingCancer();
+	destroyAsteroids();
+}
+public void shipMove()
+{
 	frameCounter++;
 	if (mousePressed==true&&frameCounter%6==0){fireBullet();}
-	if (frameCounter%100==0){generateAsteroids();}
 	if (frameCounter>=600){frameCounter=0;}
 	for (int i=0;i<bulletListLength;i++)
 	{
@@ -38,22 +62,11 @@ public void draw()
 			bulletList[i].show();
 		}
 	}
-	for (int i=0;i<asteroidList.size();i++)
-	{
-		asteroidList.get(i).move();
-		asteroidList.get(i).rotate();
-		if (asteroidList.get(i).getDead()==false)
-		{
-			asteroidList.get(i).show();
-		}
-	}
 	shipMagellan.rotate();
 	shipMagellan.show();
 	shipMagellan.move();
 	shipMagellan.accelerate();
 	loadBar();
-	hitSomething();
-	destroyAsteroids();
 }
 public void fireBullet()
 {
@@ -103,8 +116,9 @@ public void loadBar()
 	fill(255);
 	rect(10,580,(int)(shipHealth*1.8),10);
 }
-public void hitSomething()
+public void hitSomethingCancer()
 {
+	//BULLET ASTEROID CONTACT
 	for (int loop1=0;loop1<bulletListLength;loop1++)
 	{
 		for (int loop2=0;loop2<asteroidList.size();loop2++)
@@ -113,15 +127,16 @@ public void hitSomething()
 			{
 				if(bulletList[loop1].getFuel()/10<asteroidList.get(loop2).getFuel())
 				{
-					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()/5)));
+					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()/asteroidList.get(loop2).getSize())));
 					bulletList[loop1].setFuel(0);
 				}else
 				{
-					bulletList[loop1].setFuel(bulletList[loop1].getFuel()-(asteroidList.get(loop2).getFuel()*5));
+					bulletList[loop1].setFuel(bulletList[loop1].getFuel()-(asteroidList.get(loop2).getFuel()*asteroidList.get(loop2).getSize()));
 					asteroidList.get(loop2).setFuel(0);				}
 			}
 		}
 	}
+	//SHIP ASTEROID CONTACT
 	for (int loop1=0;loop1<asteroidList.size();loop1++)
 	{
 		if(dist(asteroidList.get(loop1).getX(),asteroidList.get(loop1).getY(),shipMagellan.getX(),shipMagellan.getY())<=(asteroidList.get(loop1).getSize()*13)+8&&asteroidList.get(loop1).getDead()==false)
@@ -130,6 +145,7 @@ public void hitSomething()
 			asteroidList.get(loop1).setFuel(0);
 		}
 	}
+	//BULLET BOSS CONTACT
 }
 public void generateAsteroids()
 {
@@ -290,6 +306,10 @@ class Bullet extends Floater
     	else {isDead =true;}
     }
 }
+class CancerHead
+{
+	
+}
 class Asteroid extends Bullet
 {
 	int astdSize;
@@ -329,8 +349,8 @@ class Asteroid extends Bullet
 	public void accelerate()
     {
 		double dRadians =((int)(Math.random()*361))*(Math.PI/180);
-		myDirectionX = (speedCont*0.5 * Math.cos(dRadians));
-		myDirectionY = (speedCont*0.5 * Math.sin(dRadians));
+		myDirectionX = (speedCont/astdSize * Math.cos(dRadians));
+		myDirectionY = (speedCont/astdSize * Math.sin(dRadians));
     }
     public void move()
     {
