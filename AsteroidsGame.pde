@@ -15,7 +15,11 @@ int bulletListLength = 0;
 int frameCounter = 0;
 int shipHealth = 100;
 //SCREENS
+boolean titleScreen = false;
+boolean bossSelectScreen = false;
+boolean cancerEnterScreen = faaaaalse;
 boolean cancerBossScreen = true;
+boolean deathScreen = false;
 public void setup() 
 {
 	size(1000,600);
@@ -29,10 +33,54 @@ public void setup()
 }
 public void draw() 
 {
-	if(cancerBossScreen == true)
+	if(deathScreen == true)
+	{
+		deathScreenDraw();
+	}
+	else if(cancerBossScreen == true)
 	{
 		cancerBossDraw();
 	}
+}
+public void titleDraw()
+{
+
+}
+public void bossSelectDraw()
+{
+
+}
+public void shipMove()
+{
+	frameCounter++;
+	if(shipHealth>0)
+	{
+		if (mousePressed==true&&frameCounter%6==0){fireBullet();}
+		if (frameCounter>=600){frameCounter=0;}
+		for (int i=0;i<bulletListLength;i++)
+		{
+			bulletList[i].move();
+			bulletList[i].rotate();
+			if (bulletList[i].getDead()==false)
+			{
+				bulletList[i].show();
+			}
+		}
+		shipMagellan.rotate();
+		shipMagellan.move();
+		shipMagellan.show();
+		shipMagellan.accelerate();
+	}
+	loadBar();
+    if(shipHealth<=0)
+    {
+    	deathScreen=true;
+    	shipHealth=0;
+    }
+}
+public void cancerEnterDraw()
+{
+	
 }
 public void cancerBossDraw()
 {
@@ -48,29 +96,21 @@ public void cancerBossDraw()
 		}
 	}
 	shipMove();
+	if(shipHealth>0)
+	{
+		hitSomethingCancer();
+	}
 	mainCancerHead.show();
-	hitSomethingCancer();
 	destroyAsteroids();
 }
-public void shipMove()
+public void deathScreenDraw()
 {
-	frameCounter++;
-	if (mousePressed==true&&frameCounter%6==0){fireBullet();}
-	if (frameCounter>=600){frameCounter=0;}
-	for (int i=0;i<bulletListLength;i++)
-	{
-		bulletList[i].move();
-		bulletList[i].rotate();
-		if (bulletList[i].getDead()==false)
-		{
-			bulletList[i].show();
-		}
-	}
-	shipMagellan.rotate();
-	shipMagellan.show();
-	shipMagellan.move();
-	shipMagellan.accelerate();
-	loadBar();
+	if(cancerBossScreen==true){cancerBossDraw();}
+	if(frameCounter>=6){frameCounter=0;}
+	fill(255);
+	textSize(100);
+	textAlign(CENTER,CENTER); 
+	text("YOU DIED",500,275);
 }
 public void fireBullet()
 {
@@ -166,10 +206,10 @@ public void generateAsteroids()
 {
 	int [] astdSizeCount = new int[4];
 	for (int lp1=0;lp1<asteroidList.size();lp1++){astdSizeCount[asteroidList.get(lp1).getSize()-1]++;}
-	if(astdSizeCount[0]<=2){asteroidList.add(new Asteroid(4,(int)(Math.random()*1200)-100,-100));}
-	if(astdSizeCount[1]<=4){asteroidList.add(new Asteroid(3,(int)(Math.random()*1200)-100,-100));}
-	if(astdSizeCount[2]<=8){asteroidList.add(new Asteroid(2,(int)(Math.random()*1200)-100,-100));}
-	if(astdSizeCount[3]<=16){asteroidList.add(new Asteroid(1,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[0]<=2&&asteroidList.size()<=16){asteroidList.add(new Asteroid(4,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[1]<=4&&asteroidList.size()<=32){asteroidList.add(new Asteroid(3,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[2]<=8&&asteroidList.size()<=48){asteroidList.add(new Asteroid(2,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[3]<=16&&asteroidList.size()<=64){asteroidList.add(new Asteroid(1,(int)(Math.random()*1200)-100,-100));}
 }
 public void destroyAsteroids()
 {
@@ -184,7 +224,7 @@ public void destroyAsteroids()
 }
 class SpaceShip extends Floater  
 {
-	private int warpPoint;
+	private int warpPoint,counter;
 	private boolean shipSpecial;
     public SpaceShip()
     {
@@ -203,6 +243,7 @@ class SpaceShip extends Floater
         myPointDirection = 0;
         warpPoint = 0;
         shipSpecial=false;
+        counter=0;
     }
     public void setX(int x) {myCenterX = x;}
     public int getX(){return (int)myCenterX;}
@@ -245,24 +286,37 @@ class SpaceShip extends Floater
         else if (myCenterY<20){myCenterY = 20;}
         if (keySpace == true&&warpPoint>=180)
         {
-			for(int lp1=0;lp1<asteroidList.size();lp1++)
-			{
-				if(dist(asteroidList.get(lp1).getX(),asteroidList.get(lp1).getY(),(float)myCenterX,(float)myCenterY)<=300)
-				{
-					asteroidList.get(lp1).setDead(true);
-				}
-			}
 			shipSpecial=true;
         	warpPoint = 0;
         }
     	if (warpPoint>=180){warpPoint = 180;}
     	else{warpPoint++;}
+    	if(shipSpecial==true)
+    	{
+    		if(cancerBossScreen==true)
+    		{
+    			powerSurge();
+    		}
+    	}
     }
     public void powerSurge()
     {
+		for(int lp1=0;lp1<asteroidList.size();lp1++)
+		{
+			if(dist(asteroidList.get(lp1).getX(),asteroidList.get(lp1).getY(),(float)myCenterX,(float)myCenterY)<=(60-counter)*5)
+			{
+				asteroidList.get(lp1).setDead(true);
+			}
+		}
+    	counter++;
 		noStroke();
 		fill(0,200,0);
-		ellipse((float)myCenterX,(float)myCenterY, 300, 300);
+		ellipse((float)myCenterX,(float)myCenterY, (60-counter)*5, (60-counter)*5);
+		if(counter==61)
+		{
+			counter=0;
+			shipSpecial=false;
+		}
     }   
 }
 class Bullet extends Floater
