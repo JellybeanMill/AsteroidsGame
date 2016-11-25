@@ -1,5 +1,7 @@
+//NESSESSARY OBJECT DECLARATIONS
 SpaceShip shipMagellan;
 Bullet [] bulletList;
+CancerHead mainCancerHead;
 ArrayList <Asteroid> asteroidList = new ArrayList <Asteroid>();
 //input variables
 boolean keyW = false;
@@ -23,6 +25,7 @@ public void setup()
 	{
 		asteroidList.add(new Asteroid(4,(int)(Math.random()*1360)-180,-80));
 	}
+	mainCancerHead = new CancerHead();
 }
 public void draw() 
 {
@@ -34,7 +37,6 @@ public void draw()
 public void cancerBossDraw()
 {
 	background(0);
-	shipMove();
 	if (frameCounter%100==0){generateAsteroids();}
 	for (int i=0;i<asteroidList.size();i++)
 	{
@@ -45,6 +47,8 @@ public void cancerBossDraw()
 			asteroidList.get(i).show();
 		}
 	}
+	shipMove();
+	mainCancerHead.show();
 	hitSomethingCancer();
 	destroyAsteroids();
 }
@@ -93,7 +97,7 @@ public void keyPressed()
 	if ((key == 's')||(key=='S')) {keyS = true;}
 	if ((key == 'a')||(key=='A')) {keyA = true;}
 	if ((key == 'd')||(key=='D')) {keyD = true;}
-	if ((key == ' ')) {keySpace = true;}
+  if ((key == ' ')) {keySpace = true;}
 }
 public void keyReleased()
 {
@@ -145,13 +149,27 @@ public void hitSomethingCancer()
 			asteroidList.get(loop1).setFuel(0);
 		}
 	}
-	//BULLET BOSS CONTACT
+	//BULLET BOSS HEAD CONTACT
+	for (int lp1=350;lp1<650;lp1++)
+	{
+		for(int lp2=0;lp2<bulletListLength;lp2++)
+		{
+			if(dist(lp1,60,bulletList[lp2].getX(),bulletList[lp2].getY())<52&&bulletList[lp2].getDead()==false)
+			{
+				mainCancerHead.setHealth(mainCancerHead.getHealth()-1);
+				bulletList[lp2].setDead(true);
+			}
+		}
+	}
 }
 public void generateAsteroids()
 {
 	int [] astdSizeCount = new int[4];
 	for (int lp1=0;lp1<asteroidList.size();lp1++){astdSizeCount[asteroidList.get(lp1).getSize()-1]++;}
-	if(astdSizeCount[0]<=4&&astdSizeCount[1]<=8&&astdSizeCount[2]<=12&&astdSizeCount[3]<=16&&asteroidList.size()<=30){asteroidList.add(new Asteroid(4,(int)(Math.random()*1160),-80));}
+	if(astdSizeCount[0]<=2){asteroidList.add(new Asteroid(4,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[1]<=4){asteroidList.add(new Asteroid(3,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[2]<=8){asteroidList.add(new Asteroid(2,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[3]<=16){asteroidList.add(new Asteroid(1,(int)(Math.random()*1200)-100,-100));}
 }
 public void destroyAsteroids()
 {
@@ -167,6 +185,7 @@ public void destroyAsteroids()
 class SpaceShip extends Floater  
 {
 	private int warpPoint;
+	private boolean shipSpecial;
     public SpaceShip()
     {
         corners = 26;
@@ -183,6 +202,7 @@ class SpaceShip extends Floater
         myDirectionY = 0;
         myPointDirection = 0;
         warpPoint = 0;
+        shipSpecial=false;
     }
     public void setX(int x) {myCenterX = x;}
     public int getX(){return (int)myCenterX;}
@@ -214,9 +234,9 @@ class SpaceShip extends Floater
 			if (abs((float)myDirectionX)<speedCont*0.05) {myDirectionX=0;}
       	}
     }
-    public void rotate(){myPointDirection=((-Math.atan2(mouseX-myCenterX, mouseY-myCenterY))*180/PI)+90;}
+    public void rotate(){myPointDirection=(Math.atan2(mouseY-myCenterY,mouseX-myCenterX))/PI*180;}
     public void move ()
-    {   
+    {
     	myCenterX += myDirectionX;
         myCenterY += myDirectionY;
         if(myCenterX>width-20) {myCenterX = width-20;}    
@@ -225,26 +245,24 @@ class SpaceShip extends Floater
         else if (myCenterY<20){myCenterY = 20;}
         if (keySpace == true&&warpPoint>=180)
         {
-        	double dRadians =myPointDirection*(Math.PI/180);
-        	if (dist((int)(myCenterX+(75*Math.cos(dRadians))),(int)(myCenterY+(75*Math.sin(dRadians))),(int)myCenterX,(int)myCenterY)<dist(mouseX,mouseY,(int)myCenterX,(int)myCenterY))
-        	{
-        		myCenterX += 125*Math.cos(dRadians);
-        		myCenterY += 125*Math.sin(dRadians);
-			}else
+			for(int lp1=0;lp1<asteroidList.size();lp1++)
 			{
-				myCenterX = mouseX;
-				myCenterY = mouseY;
+				if(dist(asteroidList.get(lp1).getX(),asteroidList.get(lp1).getY(),(float)myCenterX,(float)myCenterY)<=300)
+				{
+					asteroidList.get(lp1).setDead(true);
+				}
 			}
+			shipSpecial=true;
         	warpPoint = 0;
         }
-    	if (warpPoint>=180)
-    	{
-    		warpPoint = 180;
-    	}else
-    	{
-    		warpPoint++;
-    	}
-
+    	if (warpPoint>=180){warpPoint = 180;}
+    	else{warpPoint++;}
+    }
+    public void powerSurge()
+    {
+		noStroke();
+		fill(0,200,0);
+		ellipse((float)myCenterX,(float)myCenterY, 300, 300);
     }   
 }
 class Bullet extends Floater
@@ -279,6 +297,7 @@ class Bullet extends Floater
     public double getDirectionY(){return myDirectionY;}
     public void setPointDirection(int degrees){myPointDirection = degrees;}
     public double getPointDirection(){return myPointDirection;}
+    public void setDead(boolean inputStatus){isDead=inputStatus;}
     public boolean getDead() {return isDead;}
     public int getFuel() {return fuelPoint;}
     public void setFuel(int inputFuel) {fuelPoint = inputFuel;}
@@ -308,11 +327,51 @@ class Bullet extends Floater
 }
 class CancerHead
 {
-	
+	private int myHealth,cdLine,cdSpray,counter;
+	private boolean abLine,abSpray;
+	public CancerHead()
+	{
+		myHealth=3600;
+		cdLine=0;
+		cdSpray=0;
+		counter=0;
+	}
+	public void setHealth(int inputHealth){myHealth=inputHealth;}
+	public int getHealth(){return myHealth;}
+	public void show()
+	{
+		stroke(255,0,255);
+		fill(255,0,255);
+		rect(300,10,400,100,50);
+		stroke(255);
+		fill(255);
+		rect(319,54,362,12);
+		stroke(255,0,255);
+		fill(255,0,255);
+		rect(320,55,(int)(myHealth*0.1),10);
+		cdLine++;
+		cdSpray++;
+		if((cdLine*Math.random())>600&&abSpray==false){abLine=true;}
+		if(abLine==true){fireLine();}
+	}
+	public void fireLine()
+	{
+		counter++;
+		stroke(255,0,0);
+		line(500,110,shipMagellan.getX(),shipMagellan.getY());
+		if((counter-60>=0)&&(counter%12==0)){asteroidList.add(new Asteroid(2,500,110,true));}
+		if(counter>=125)
+		{
+			abLine=false;
+			cdLine=0;
+			counter=0;
+		}
+	}
 }
 class Asteroid extends Bullet
 {
 	int astdSize;
+	boolean astdSpecial;
 	public Asteroid(int inputSize, double inputX, double inputY)
 	{
 		corners = 8;
@@ -341,6 +400,38 @@ class Asteroid extends Bullet
 		myPointDirection=0;
 		fuelPoint = 225;
 		isDead=false;
+		astdSpecial=false;
+		accelerate();
+	}
+	public Asteroid(int inputSize, double inputX, double inputY,boolean inputStatus)
+	{
+		corners = 8;
+		astdSize = inputSize;
+		xCorners = new int[corners];
+		yCorners = new int[corners];
+		xCorners[0] = astdSize*15;
+		yCorners[0] = 0;
+		xCorners[1] = astdSize*10;
+		yCorners[1] = astdSize*10;
+		xCorners[2] = 0;
+		yCorners[2] = astdSize*15;
+		xCorners[3] = astdSize*-10;
+		yCorners[3] = astdSize*10;
+		xCorners[4] = astdSize*-15;
+		yCorners[4] = 0;
+		xCorners[5] = astdSize*-10;
+		yCorners[5] = astdSize*-10;
+		xCorners[6] = 0;
+		yCorners[6] = astdSize*-15;
+		xCorners[7] = astdSize*10;
+		yCorners[7] = astdSize*-10;
+		myCenterX = inputX;
+		myCenterY = inputY;
+		myColor = color(255,0,0);
+		myPointDirection=0;
+		fuelPoint = 225;
+		isDead=false;
+		astdSpecial=inputStatus;
 		accelerate();
 	}
 	public void setSize(int inputSize){astdSize=inputSize;}
@@ -348,22 +439,56 @@ class Asteroid extends Bullet
 	public void setDead (boolean inputDead){isDead=inputDead;}
 	public void accelerate()
     {
-		double dRadians =((int)(Math.random()*361))*(Math.PI/180);
-		myDirectionX = (speedCont/astdSize * Math.cos(dRadians));
-		myDirectionY = (speedCont/astdSize * Math.sin(dRadians));
+    	double dRadians;
+    	if(astdSpecial==true)
+    	{
+    		dRadians = (atan2(shipMagellan.getY()-60,shipMagellan.getX()-500));
+			myDirectionX = 3*(speedCont/astdSize * Math.cos(dRadians));
+			myDirectionY = 3*(speedCont/astdSize * Math.sin(dRadians));
+    	}
+    	else
+    	{
+			dRadians =((int)(Math.random()*361))*(Math.PI/180);
+			myDirectionX = (speedCont/astdSize * Math.cos(dRadians));
+			myDirectionY = (speedCont/astdSize * Math.sin(dRadians));
+		}
     }
     public void move()
     {
     	myCenterX+=myDirectionX;
     	myCenterY+=myDirectionY;
-    	if (myCenterX<-20) {myCenterX=width+15;}
-    	else if (myCenterX>width+20) {myCenterX=-15;}
-    	if (myCenterY<-20) {myCenterY=width+15;}
-    	else if (myCenterY>width+20) {myCenterY=-15;}
+    	if (myCenterX<-80) 
+    	{
+    		myCenterX=width+80;
+    		if(astdSpecial==true){isDead=true;}
+    		else{fuelPoint=225;}
+    	}
+    	else if (myCenterX>width+80) 
+    	{
+    		myCenterX=-80;
+    		if(astdSpecial==true){isDead=true;}
+    		else{fuelPoint=225;}
+    	}
+    	if (myCenterY<-80) 
+    	{
+    		myCenterY=width+80;
+    		if(astdSpecial==true){isDead=true;}
+    		else{fuelPoint=225;}
+    	}
+    	else if (myCenterY>width+80)
+    	{
+    		myCenterY=-80;
+    		if(astdSpecial==true){isDead=true;}
+    		else{fuelPoint=225;}
+    	}
     	if (fuelPoint<=0)
     	{
     		isDead=true;
-    		if(astdSize>1)
+    		if(astdSpecial==true)
+    		{
+    			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY,true));
+    		}
+    		else if(astdSize>1)
     		{
     			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY));
     			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY));
@@ -373,7 +498,7 @@ class Asteroid extends Bullet
     }
 }
 abstract class Floater //Do NOT modify the Floater class! Make changes in the SpaceShip class 
-{   
+{
   protected int corners;  //the number of corners, a triangular floater has 3   
   protected int[] xCorners;   
   protected int[] yCorners;   
