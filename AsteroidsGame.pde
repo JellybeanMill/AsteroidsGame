@@ -3,52 +3,71 @@ SpaceShip shipMagellan;
 Bullet [] bulletList;
 CancerHead mainCancerHead;
 ArrayList <Asteroid> asteroidList = new ArrayList <Asteroid>();
-//input variables
+//INPUT VARIABLES
 boolean keyW = false;
 boolean keyA = false;
 boolean keyS = false;
 boolean keyD = false;
 boolean keySpace = false;
-//your variable declarations here
+//GLOBAL VARIABLES
 float speedCont = 5;
 int bulletListLength = 0;
 int frameCounter = 0;
 int shipHealth = 100;
 //SCREENS
-boolean titleScreen = false;
+boolean titleScreen = true;
 boolean bossSelectScreen = false;
-boolean cancerEnterScreen = faaaaalse;
-boolean cancerBossScreen = true;
+boolean cancerEnterScreen = false;
+boolean cancerBossScreen = false;
 boolean deathScreen = false;
+//BUTTONS
+Button aquariusStart;
+Button piscesStart;
+Button ariesStart;
+Button taurusStart;
+Button geminiStart;
+Button cancerStart;
+Button leoStart;
+Button virgoStart;
+Button libraStart;
+Button scorpioStart;
+Button sagittariusStart;
+Button capricornStart;
 public void setup() 
 {
 	size(1000,600);
 	shipMagellan = new SpaceShip();
 	bulletList = new Bullet[300];
-	for(int i =0;i<5;i++)
-	{
-		asteroidList.add(new Asteroid(4,(int)(Math.random()*1360)-180,-80));
-	}
-	mainCancerHead = new CancerHead();
+	cancerStart = new Button("CANCER",10,875,150,150,150);
 }
 public void draw() 
 {
-	if(deathScreen == true)
+	if(titleScreen==true){titleDraw();}
+	else if(bossSelectScreen==true){bossSelectDraw();}
+	else if(deathScreen == true){deathScreenDraw();}
+	else if(cancerBossScreen == true){cancerBossDraw();}
+}
+public void mouseClicked()
+{
+	if(titleScreen==true)
 	{
-		deathScreenDraw();
-	}
-	else if(cancerBossScreen == true)
-	{
-		cancerBossDraw();
+		titleScreen=false;
+		bossSelectScreen=true;
+		frameCounter=0;
 	}
 }
 public void titleDraw()
 {
-
+	background(0);
+	textAlign(CENTER,CENTER);
+	fill(255);
+	textSize(20);
+	text("Click anywhere to start",500,500);
 }
 public void bossSelectDraw()
 {
-
+	background(0);
+	cancerStart.show();
 }
 public void shipMove()
 {
@@ -80,7 +99,11 @@ public void shipMove()
 }
 public void cancerEnterDraw()
 {
-	
+	for(int i =0;i<5;i++)
+	{
+		asteroidList.add(new Asteroid(4,(int)(Math.random()*1360)-180,-80));
+	}
+	mainCancerHead = new CancerHead();
 }
 public void cancerBossDraw()
 {
@@ -206,9 +229,9 @@ public void generateAsteroids()
 {
 	int [] astdSizeCount = new int[4];
 	for (int lp1=0;lp1<asteroidList.size();lp1++){astdSizeCount[asteroidList.get(lp1).getSize()-1]++;}
-	if(astdSizeCount[0]<=2&&asteroidList.size()<=16){asteroidList.add(new Asteroid(4,(int)(Math.random()*1200)-100,-100));}
-	if(astdSizeCount[1]<=4&&asteroidList.size()<=32){asteroidList.add(new Asteroid(3,(int)(Math.random()*1200)-100,-100));}
-	if(astdSizeCount[2]<=8&&asteroidList.size()<=48){asteroidList.add(new Asteroid(2,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[0]<=2&&asteroidList.size()<=64){asteroidList.add(new Asteroid(4,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[1]<=4&&asteroidList.size()<=64){asteroidList.add(new Asteroid(3,(int)(Math.random()*1200)-100,-100));}
+	if(astdSizeCount[2]<=8&&asteroidList.size()<=64){asteroidList.add(new Asteroid(2,(int)(Math.random()*1200)-100,-100));}
 	if(astdSizeCount[3]<=16&&asteroidList.size()<=64){asteroidList.add(new Asteroid(1,(int)(Math.random()*1200)-100,-100));}
 }
 public void destroyAsteroids()
@@ -625,4 +648,54 @@ abstract class Floater //Do NOT modify the Floater class! Make changes in the Sp
     }   
     endShape(CLOSE);  
   }   
-} 
+}
+class Button
+{
+	private int myX, myY, myWidth, myLength, myTextSize, myStrokeColorNormal, myStrokeColorHover, myFillColorNormal, myFillColorHover;
+	private float myHoverConstant;
+	private String myText;
+	private int [] hoverRange;
+	private boolean hovering, clickable;
+	public Button(String inputText, int inputTextSize, int inputX, int inputY, int inputWidth, int inputLength)
+	{
+		myText=inputText;
+		myTextSize=inputTextSize;
+		myX=inputX;
+		myY=inputY;
+		myWidth=inputWidth;
+		myLength=inputLength;
+		myStrokeColorNormal = color(255,255,255);
+		myFillColorNormal = color(0,0,0);
+		myStrokeColorHover=myStrokeColorNormal;
+		myFillColorHover=myFillColorNormal;
+		myHoverConstant=1.1;
+		hovering=false;
+		clickable=true;
+	}
+	public void show()
+	{
+		if(clickable=false){myFillColorNormal=color(220,220,220);}
+		if(mouseX<myX-(myWidth*0.5)&&mouseX<myX+(myWidth*0.5)&&mouseY<myY-(myLength*0.5)&&mouseY<myY+(myLength*0.5)&&clickable==true)
+		{
+			hovering=true;
+			stroke(myStrokeColorHover);
+			fill(myFillColorHover);
+			rect(myX-(0.5*myWidth*myHoverConstant),myY-(0.5*myLength*myHoverConstant),myWidth*myHoverConstant,myLength*myHoverConstant);
+			fill(myStrokeColorHover);
+			textSize(myTextSize*myHoverConstant);
+			textAlign(CENTER,CENTER);
+		}
+		else
+		{
+			hovering=false;
+			stroke(myStrokeColorNormal);
+			fill(myFillColorNormal);
+			rect(myX-(0.5*myWidth),myY-(0.5*myLength),myWidth,myLength);
+			fill(myStrokeColorNormal);
+			textSize(myTextSize);
+			textAlign(CENTER,CENTER);
+			text(myText,myX,myY);		
+		}
+	}
+	public boolean isHovering(){return hovering;}
+}
