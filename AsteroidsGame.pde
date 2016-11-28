@@ -38,7 +38,7 @@ public void setup()
 	size(1000,600);
 	shipMagellan = new SpaceShip();
 	bulletList = new Bullet[300];
-	cancerStart = new Button("CANCER",10,875,150,150,150);
+	cancerStart = new Button("CANCER",20,875,150,150,150);
 }
 public void draw() 
 {
@@ -54,6 +54,12 @@ public void mouseClicked()
 		titleScreen=false;
 		bossSelectScreen=true;
 		frameCounter=0;
+	}
+	if(bossSelectScreen==true&&cancerStart.isHovering()==true)
+	{
+		bossSelectScreen=false;
+		cancerEnterDraw();
+		cancerBossScreen=true;
 	}
 }
 public void titleDraw()
@@ -674,16 +680,18 @@ class Button
 	}
 	public void show()
 	{
-		if(clickable=false){myFillColorNormal=color(220,220,220);}
-		if(mouseX<myX-(myWidth*0.5)&&mouseX<myX+(myWidth*0.5)&&mouseY<myY-(myLength*0.5)&&mouseY<myY+(myLength*0.5)&&clickable==true)
+		if(clickable==false){myFillColorNormal=color(220,220,220);}
+		if(mouseX>myX-(myWidth*0.5)&&mouseX<myX+(myWidth*0.5)&&mouseY>myY-(myLength*0.5)&&mouseY<myY+(myLength*0.5)&&clickable==true)
 		{
+			println("ran");
 			hovering=true;
 			stroke(myStrokeColorHover);
 			fill(myFillColorHover);
 			rect(myX-(0.5*myWidth*myHoverConstant),myY-(0.5*myLength*myHoverConstant),myWidth*myHoverConstant,myLength*myHoverConstant);
 			fill(myStrokeColorHover);
-			textSize(myTextSize*myHoverConstant);
+			textSize((int)(myTextSize*myHoverConstant));
 			textAlign(CENTER,CENTER);
+			text(myText,myX,myY);
 		}
 		else
 		{
