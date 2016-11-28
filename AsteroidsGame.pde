@@ -13,7 +13,7 @@ boolean keySpace = false;
 float speedCont = 5;
 int bulletListLength = 0;
 int frameCounter = 0;
-int shipHealth = 100;
+int shipHealth = 50;
 //SCREENS
 boolean titleScreen = true;
 boolean bossSelectScreen = false;
@@ -187,7 +187,7 @@ public void loadBar()
 	fill(0,0,255);
 	rect(811,580,shipMagellan.getWarpPoint(),10);
 	fill(255);
-	rect(10,580,(int)(shipHealth*1.8),10);
+	rect(10,580,(int)(shipHealth*3.6),10);
 }
 public void hitSomethingCancer()
 {
@@ -410,17 +410,19 @@ class Bullet extends Floater
 }
 class CancerHead
 {
-	private int myHealth,cdLine,cdSpray,counter;
+	private int myHealth,cdLine,cdSpray,abCounter,targetX,targetY;
 	private boolean abLine,abSpray;
 	public CancerHead()
 	{
-		myHealth=3600;
+		myHealth=1800;
 		cdLine=0;
 		cdSpray=0;
-		counter=0;
+		abCounter=0;
 	}
 	public void setHealth(int inputHealth){myHealth=inputHealth;}
 	public int getHealth(){return myHealth;}
+	public int getTargetX(){return targetX;}
+	public int getTargetY(){return targetY;}
 	public void show()
 	{
 		stroke(255,0,255);
@@ -431,23 +433,26 @@ class CancerHead
 		rect(319,54,362,12);
 		stroke(255,0,255);
 		fill(255,0,255);
-		rect(320,55,(int)(myHealth*0.1),10);
+		rect(320,55,(int)(myHealth*0.2),10);
 		cdLine++;
 		cdSpray++;
-		if((cdLine*Math.random())>600&&abSpray==false){abLine=true;}
+		if((cdLine*Math.random())>600&&abSpray==false&&abLine==false)
+		{
+			abLine=true;
+			targetX=shipMagellan.getX();
+			targetY=shipMagellan.getY();
+			cdLine=0;
+		}
 		if(abLine==true){fireLine();}
 	}
 	public void fireLine()
 	{
-		counter++;
-		stroke(255,0,0);
-		line(500,110,shipMagellan.getX(),shipMagellan.getY());
-		if((counter-60>=0)&&(counter%12==0)){asteroidList.add(new Asteroid(2,500,110,true));}
-		if(counter>=125)
+		abCounter++;
+		if((abCounter>=0)&&(abCounter%12==0)){asteroidList.add(new Asteroid(2,500,110,true));}
+		if(abCounter>=65)
 		{
 			abLine=false;
-			cdLine=0;
-			counter=0;
+			abCounter=0;
 		}
 	}
 }
@@ -525,9 +530,9 @@ class Asteroid extends Bullet
     	double dRadians;
     	if(astdSpecial==true)
     	{
-    		dRadians = (atan2(shipMagellan.getY()-60,shipMagellan.getX()-500));
-			myDirectionX = 3*(speedCont/astdSize * Math.cos(dRadians));
-			myDirectionY = 3*(speedCont/astdSize * Math.sin(dRadians));
+    		dRadians = (atan2(mainCancerHead.getTargetY()-60,mainCancerHead.getTargetX()-500));
+			myDirectionX = 5*(speedCont/astdSize * Math.cos(dRadians));
+			myDirectionY = 5*(speedCont/astdSize * Math.sin(dRadians));
     	}
     	else
     	{
@@ -683,7 +688,6 @@ class Button
 		if(clickable==false){myFillColorNormal=color(220,220,220);}
 		if(mouseX>myX-(myWidth*0.5)&&mouseX<myX+(myWidth*0.5)&&mouseY>myY-(myLength*0.5)&&mouseY<myY+(myLength*0.5)&&clickable==true)
 		{
-			println("ran");
 			hovering=true;
 			stroke(myStrokeColorHover);
 			fill(myFillColorHover);
