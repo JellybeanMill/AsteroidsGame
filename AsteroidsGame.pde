@@ -134,12 +134,16 @@ public void cancerBossDraw()
 }
 public void deathScreenDraw()
 {
-	if(cancerBossScreen==true){cancerBossDraw();}
-	if(frameCounter>=6){frameCounter=0;}
-	fill(255);
-	textSize(100);
-	textAlign(CENTER,CENTER); 
-	text("YOU DIED",500,275);
+	frameCounter++;
+	if(cancerBossScreen==true&&frameCounter%6==0)
+	{
+		cancerBossDraw();
+		fill(255);
+		textSize(100);
+		textAlign(CENTER,CENTER); 
+		text("YOU DIED",500,275);
+	}
+	if(frameCounter>=6){frameCounter=1;}
 }
 public void fireBullet()
 {
@@ -444,21 +448,46 @@ class CancerHead
 			cdLine=0;
 		}
 		if(abLine==true){fireLine();}
+		if((cdSpray*Math.random())>1000&&abLine==false&&abSpray==false)
+		{
+			abSpray=true;
+			targetX=shipMagellan.getX();
+			targetY=shipMagellan.getY();
+			cdSpray=0;
+		}
+		if(abSpray==true){fireSpray();}
 	}
 	public void fireLine()
 	{
 		abCounter++;
-		if((abCounter>=0)&&(abCounter%12==0)){asteroidList.add(new Asteroid(2,500,110,true));}
+		if((abCounter>=0)&&(abCounter%12==0)){asteroidList.add(new Asteroid(2,500,110,targetX,targetY));}
 		if(abCounter>=65)
 		{
 			abLine=false;
 			abCounter=0;
 		}
 	}
+	public void fireSpray()
+	{
+		abCounter++;
+		if((abCounter>=0)&&(abCounter%20==0))
+		{
+			asteroidList.add(new Asteroid(2,500,110,33,600));
+			asteroidList.add(new Asteroid(2,500,110,230,600));
+			asteroidList.add(new Asteroid(2,500,110,500,600));
+			asteroidList.add(new Asteroid(2,500,110,770,600));
+			asteroidList.add(new Asteroid(2,500,110,967,600));
+		}
+		if(abCounter>=65)
+		{
+			abSpray=false;
+			abCounter=0;
+		}
+	}
 }
 class Asteroid extends Bullet
 {
-	int astdSize;
+	int astdSize, targetX, targetY;
 	boolean astdSpecial;
 	public Asteroid(int inputSize, double inputX, double inputY)
 	{
@@ -491,7 +520,7 @@ class Asteroid extends Bullet
 		astdSpecial=false;
 		accelerate();
 	}
-	public Asteroid(int inputSize, double inputX, double inputY,boolean inputStatus)
+	public Asteroid(int inputSize, double inputX, double inputY,int inputTargetX, int inputTargetY)
 	{
 		corners = 8;
 		astdSize = inputSize;
@@ -519,7 +548,9 @@ class Asteroid extends Bullet
 		myPointDirection=0;
 		fuelPoint = 225;
 		isDead=false;
-		astdSpecial=inputStatus;
+		astdSpecial=true;
+		targetX=inputTargetX;
+		targetY=inputTargetY;
 		accelerate();
 	}
 	public void setSize(int inputSize){astdSize=inputSize;}
@@ -530,7 +561,7 @@ class Asteroid extends Bullet
     	double dRadians;
     	if(astdSpecial==true)
     	{
-    		dRadians = (atan2(mainCancerHead.getTargetY()-60,mainCancerHead.getTargetX()-500));
+    		dRadians = (atan2(targetY-60,targetX-500));
 			myDirectionX = 5*(speedCont/astdSize * Math.cos(dRadians));
 			myDirectionY = 5*(speedCont/astdSize * Math.sin(dRadians));
     	}
@@ -574,7 +605,7 @@ class Asteroid extends Bullet
     		isDead=true;
     		if(astdSpecial==true)
     		{
-    			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY,true));
+    			asteroidList.add(new Asteroid(astdSize-1,myCenterX,myCenterY,targetX,targetY));
     		}
     		else if(astdSize>1)
     		{
