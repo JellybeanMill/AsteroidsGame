@@ -14,12 +14,14 @@ float speedCont = 5;
 int bulletListLength = 0;
 int frameCounter = 0;
 int shipHealth = 50;
+int stayCounter = 0;
 //SCREENS
 boolean titleScreen = true;
 boolean bossSelectScreen = false;
 boolean cancerEnterScreen = false;
 boolean cancerBossScreen = false;
 boolean deathScreen = false;
+boolean winScreen = false;
 //BUTTONS
 Button aquariusStart;
 Button piscesStart;
@@ -46,6 +48,7 @@ public void draw()
 	else if(bossSelectScreen==true){bossSelectDraw();}
 	else if(deathScreen == true){deathScreenDraw();}
 	else if(cancerBossScreen == true){cancerBossDraw();}
+	else if(winScreen==true){winScreenDraw();}
 }
 public void mouseClicked()
 {
@@ -114,7 +117,7 @@ public void cancerEnterDraw()
 public void cancerBossDraw()
 {
 	background(0);
-	if (frameCounter%100==0){generateAsteroids();}
+	if (frameCounter%100==0&&winScreen==false){generateAsteroids();}
 	for (int i=0;i<asteroidList.size();i++)
 	{
 		asteroidList.get(i).move();
@@ -125,14 +128,24 @@ public void cancerBossDraw()
 		}
 	}
 	shipMove();
-	if(shipHealth>0)
-	{
-		hitSomethingCancer();
-	}
-	mainCancerHead.show();
+	if(shipHealth>0){hitSomethingCancer();}
+	if(winScreen==false){mainCancerHead.show();}
 	destroyAsteroids();
 }
 public void deathScreenDraw()
+{
+	frameCounter++;
+	if(cancerBossScreen==true&&frameCounter%6==0)
+	{
+		cancerBossDraw();
+		fill(255);
+		textSize(100);
+		textAlign(CENTER,CENTER); 
+		text("YOU DIED",500,275);
+	}
+	if(frameCounter>=6){frameCounter=1;}
+}
+public void winScreenDraw()
 {
 	frameCounter++;
 	if(cancerBossScreen==true&&frameCounter%6==0)
@@ -223,16 +236,27 @@ public void hitSomethingCancer()
 		}
 	}
 	//BULLET BOSS HEAD CONTACT
-	for (int lp1=350;lp1<650;lp1++)
+	for(int lp2=0;lp2<bulletListLength;lp2++)
 	{
-		for(int lp2=0;lp2<bulletListLength;lp2++)
+		if(dist(500,-866,bulletList[lp2].getX(),bulletList[lp2].getY())<1002&&bulletList[lp2].getDead()==false)
 		{
-			if(dist(lp1,60,bulletList[lp2].getX(),bulletList[lp2].getY())<52&&bulletList[lp2].getDead()==false)
-			{
-				mainCancerHead.setHealth(mainCancerHead.getHealth()-1);
-				bulletList[lp2].setDead(true);
-			}
+			mainCancerHead.setHealth(mainCancerHead.getHealth()-1);
+			bulletList[lp2].setDead(true);
 		}
+	}
+	//SHIP BOSS HEAD CONTACT
+	if(dist(500,-866,shipMagellan.getX(),shipMagellan.getY())<=1005)
+	{
+		stayCounter++;
+		if(stayCounter>=30)
+		{
+			shipHealth--;
+			stayCounter=0;
+		}
+	}
+	else
+	{
+		stayCounter=0;	
 	}
 }
 public void generateAsteroids()
@@ -431,7 +455,7 @@ class CancerHead
 	{
 		stroke(255,0,255);
 		fill(255,0,255);
-		rect(300,10,400,100,50);
+		ellipse(500,-866,2000,2000);
 		stroke(255);
 		fill(255);
 		rect(319,54,362,12);
