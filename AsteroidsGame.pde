@@ -20,6 +20,7 @@ boolean titleScreen = true;
 boolean bossSelectScreen = false;
 boolean cancerEnterScreen = false;
 boolean cancerBossScreen = false;
+boolean bossBattleTrue = false;
 boolean deathScreen = false;
 boolean winScreen = false;
 //BUTTONS
@@ -35,20 +36,22 @@ Button libraStart;
 Button scorpioStart;
 Button sagittariusStart;
 Button capricornStart;
+Button returnToMainMenu;
 public void setup() 
 {
 	size(1000,600);
 	shipMagellan = new SpaceShip();
 	bulletList = new Bullet[300];
 	cancerStart = new Button("CANCER",20,875,150,150,150);
+	returnToMainMenu = new Button("Main Menu",20,500,450,150,50);
 }
-public void draw() 
+public void draw()
 {
 	if(titleScreen==true){titleDraw();}
 	else if(bossSelectScreen==true){bossSelectDraw();}
 	else if(deathScreen == true){deathScreenDraw();}
-	else if(cancerBossScreen == true){cancerBossDraw();}
 	else if(winScreen==true){winScreenDraw();}
+	else if(cancerBossScreen == true){cancerBossDraw();}
 }
 public void mouseClicked()
 {
@@ -63,6 +66,12 @@ public void mouseClicked()
 		bossSelectScreen=false;
 		cancerEnterDraw();
 		cancerBossScreen=true;
+	}
+	if(bossBattleTrue==true&&returnToMainMenu.isHovering()==true)
+	{
+		cancerBossScreen=false;
+		bossSelectScreen=true;
+		bossBattleTrue=false;
 	}
 }
 public void titleDraw()
@@ -95,9 +104,12 @@ public void shipMove()
 			}
 		}
 		shipMagellan.rotate();
-		shipMagellan.move();
+		if(winScreen==false)
+		{
+			shipMagellan.move();
+			shipMagellan.accelerate();
+		}
 		shipMagellan.show();
-		shipMagellan.accelerate();
 	}
 	loadBar();
     if(shipHealth<=0)
@@ -113,6 +125,7 @@ public void cancerEnterDraw()
 		asteroidList.add(new Asteroid(4,(int)(Math.random()*1360)-180,-80));
 	}
 	mainCancerHead = new CancerHead();
+	bossBattleTrue = true;
 }
 public void cancerBossDraw()
 {
@@ -128,9 +141,15 @@ public void cancerBossDraw()
 		}
 	}
 	shipMove();
-	if(shipHealth>0){hitSomethingCancer();}
+	if(shipHealth>0&&winScreen==false){hitSomethingCancer();}
 	if(winScreen==false){mainCancerHead.show();}
 	destroyAsteroids();
+	if(mainCancerHead.getHealth()<=0)
+	{
+		frameCounter=0;
+		winScreen=true;
+		mainCancerHead.setHealth(0);
+	}
 }
 public void deathScreenDraw()
 {
@@ -144,6 +163,7 @@ public void deathScreenDraw()
 		text("YOU DIED",500,275);
 	}
 	if(frameCounter>=6){frameCounter=1;}
+	returnToMainMenu.show();
 }
 public void winScreenDraw()
 {
@@ -154,9 +174,10 @@ public void winScreenDraw()
 		fill(255);
 		textSize(100);
 		textAlign(CENTER,CENTER); 
-		text("YOU DIED",500,275);
+		text("YOU WON",500,275);
 	}
 	if(frameCounter>=6){frameCounter=1;}
+	returnToMainMenu.show();
 }
 public void fireBullet()
 {
@@ -213,11 +234,11 @@ public void hitSomethingCancer()
 	{
 		for (int loop2=0;loop2<asteroidList.size();loop2++)
 		{
-			if (dist(bulletList[loop1].getX(),bulletList[loop1].getY(),asteroidList.get(loop2).getX(),asteroidList.get(loop2).getY())<=(asteroidList.get(loop2).getSize()*15))
+			if (dist(bulletList[loop1].getX(),bulletList[loop1].getY(),asteroidList.get(loop2).getX(),asteroidList.get(loop2).getY())<=(asteroidList.get(loop2).getSize()*15.0))
 			{
-				if(bulletList[loop1].getFuel()/10<asteroidList.get(loop2).getFuel())
+				if(bulletList[loop1].getFuel()/10.0<asteroidList.get(loop2).getFuel())
 				{
-					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()/asteroidList.get(loop2).getSize())));
+					asteroidList.get(loop2).setFuel(asteroidList.get(loop2).getFuel()-((int)(bulletList[loop1].getFuel()/(float)(asteroidList.get(loop2).getSize()))));
 					bulletList[loop1].setFuel(0);
 				}else
 				{
@@ -442,7 +463,7 @@ class CancerHead
 	private boolean abLine,abSpray;
 	public CancerHead()
 	{
-		myHealth=1800;
+		myHealth=180;
 		cdLine=0;
 		cdSpray=0;
 		abCounter=0;
@@ -461,7 +482,7 @@ class CancerHead
 		rect(319,54,362,12);
 		stroke(255,0,255);
 		fill(255,0,255);
-		rect(320,55,(int)(myHealth*0.2),10);
+		rect(320,55,(int)(myHealth*2),10);
 		cdLine++;
 		cdSpray++;
 		if((cdLine*Math.random())>600&&abSpray==false&&abLine==false)
@@ -496,11 +517,13 @@ class CancerHead
 		abCounter++;
 		if((abCounter>=0)&&(abCounter%20==0))
 		{
+			asteroidList.add(new Asteroid(2,500,110,0,110));
 			asteroidList.add(new Asteroid(2,500,110,33,600));
 			asteroidList.add(new Asteroid(2,500,110,230,600));
 			asteroidList.add(new Asteroid(2,500,110,500,600));
 			asteroidList.add(new Asteroid(2,500,110,770,600));
 			asteroidList.add(new Asteroid(2,500,110,967,600));
+			asteroidList.add(new Asteroid(2,500,110,1000,110));
 		}
 		if(abCounter>=65)
 		{
@@ -586,14 +609,14 @@ class Asteroid extends Bullet
     	if(astdSpecial==true)
     	{
     		dRadians = (atan2(targetY-60,targetX-500));
-			myDirectionX = 5*(speedCont/astdSize * Math.cos(dRadians));
-			myDirectionY = 5*(speedCont/astdSize * Math.sin(dRadians));
+			myDirectionX = 5*(speedCont/((float)(astdSize)) * Math.cos(dRadians));
+			myDirectionY = 5*(speedCont/((float)(astdSize)) * Math.sin(dRadians));
     	}
     	else
     	{
 			dRadians =((int)(Math.random()*361))*(Math.PI/180);
-			myDirectionX = (speedCont/astdSize * Math.cos(dRadians));
-			myDirectionY = (speedCont/astdSize * Math.sin(dRadians));
+			myDirectionX = (speedCont/((float)(astdSize)) * Math.cos(dRadians));
+			myDirectionY = (speedCont/((float)(astdSize)) * Math.sin(dRadians));
 		}
     }
     public void move()
