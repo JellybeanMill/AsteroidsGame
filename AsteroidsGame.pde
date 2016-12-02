@@ -9,6 +9,7 @@ boolean keyA = false;
 boolean keyS = false;
 boolean keyD = false;
 boolean keySpace = false;
+boolean keyShift = false;
 //GLOBAL VARIABLES
 float speedCont = 5;
 int bulletListLength = 0;
@@ -63,6 +64,7 @@ public void mouseClicked()
 	}
 	if(bossSelectScreen==true&&cancerStart.isHovering()==true)
 	{
+		println("ran");
 		bossSelectScreen=false;
 		cancerEnterDraw();
 		cancerBossScreen=true;
@@ -70,6 +72,8 @@ public void mouseClicked()
 	if(bossBattleTrue==true&&returnToMainMenu.isHovering()==true)
 	{
 		cancerBossScreen=false;
+		winScreen=false;
+		deathScreen=false;
 		bossSelectScreen=true;
 		bossBattleTrue=false;
 	}
@@ -120,6 +124,7 @@ public void shipMove()
 }
 public void cancerEnterDraw()
 {
+	for(int lp1=asteroidList.size()-1;lp1>=0;lp1--){asteroidList.remove(lp1);}
 	for(int i =0;i<5;i++)
 	{
 		asteroidList.add(new Asteroid(4,(int)(Math.random()*1360)-180,-80));
@@ -204,7 +209,11 @@ public void keyPressed()
 	if ((key == 's')||(key=='S')) {keyS = true;}
 	if ((key == 'a')||(key=='A')) {keyA = true;}
 	if ((key == 'd')||(key=='D')) {keyD = true;}
-  if ((key == ' ')) {keySpace = true;}
+	if ((key == ' ')) {keySpace = true;}
+	if (key == CODED)
+	{
+		if(keyCode == SHIFT){keyShift = true;}
+	}
 }
 public void keyReleased()
 {
@@ -213,6 +222,10 @@ public void keyReleased()
 	if ((key == 'a')||(key=='A')) {keyA = false;}
 	if ((key == 'd')||(key=='D')) {keyD = false;}
 	if ((key == ' ')) {keySpace = false;}
+	if (key == CODED)
+	{
+		if(keyCode == SHIFT){keyShift = false;}
+	}
 }
 public void loadBar()
 {
@@ -302,8 +315,8 @@ public void destroyAsteroids()
 }
 class SpaceShip extends Floater  
 {
-	private int warpPoint,counter;
-	private boolean shipSpecial;
+	private int warpPoint,dashCounter,dashAccelerator;
+	private boolean shipSpecial,dashPress,nowDashing;
     public SpaceShip()
     {
         corners = 26;
@@ -321,7 +334,10 @@ class SpaceShip extends Floater
         myPointDirection = 0;
         warpPoint = 0;
         shipSpecial=false;
-        counter=0;
+        dashPress=false;
+        nowDashing=false;
+        dashCounter=0;
+        dashAccelerator=1;
     }
     public void setX(int x) {myCenterX = x;}
     public int getX(){return (int)myCenterX;}
@@ -356,28 +372,36 @@ class SpaceShip extends Floater
     public void rotate(){myPointDirection=(Math.atan2(mouseY-myCenterY,mouseX-myCenterX))/PI*180;}
     public void move ()
     {
-    	myCenterX += myDirectionX;
-        myCenterY += myDirectionY;
+    	myCenterX += myDirectionX*dashAccelerator;
+        myCenterY += myDirectionY*dashAccelerator;
         if(myCenterX>width-20) {myCenterX = width-20;}    
         else if(myCenterX<20){myCenterX = 20;}    
         if(myCenterY>height-20){myCenterY = height-20;}   
         else if (myCenterY<20){myCenterY = 20;}
-        if (keySpace == true&&warpPoint>=180)
-        {
-			shipSpecial=true;
-        	warpPoint = 0;
+        if (keyShift == true&&warpPoint>=30&&dashPress==false)
+		{
+			nowDashing=true;
+        	warpPoint-=30;
+        	dashPress=true;
         }
+        else if(keyShift==false){dashPress=false;}
     	if (warpPoint>=180){warpPoint = 180;}
     	else{warpPoint++;}
-    	if(shipSpecial==true)
+    	//POWERSURGE ACTIVATOR
+    	/*if(shipSpecial==true)
     	{
     		if(cancerBossScreen==true)
     		{
     			powerSurge();
     		}
+    	}*/
+    	if(nowDashing==true)
+    	{
+
     	}
     }
-    public void powerSurge()
+	//ACTUAL POWERSURGE FUNCTION
+    /*public void powerSurge()
     {
 		for(int lp1=0;lp1<asteroidList.size();lp1++)
 		{
@@ -395,7 +419,11 @@ class SpaceShip extends Floater
 			counter=0;
 			shipSpecial=false;
 		}
-    }   
+    }*/
+    public void dash()
+    {
+
+    }
 }
 class Bullet extends Floater
 {
