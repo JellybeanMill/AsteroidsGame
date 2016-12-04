@@ -50,9 +50,9 @@ public void draw()
 {
 	if(titleScreen==true){titleDraw();}
 	else if(bossSelectScreen==true){bossSelectDraw();}
-	else if(deathScreen == true){deathScreenDraw();}
+	else if(deathScreen==true){deathScreenDraw();}
 	else if(winScreen==true){winScreenDraw();}
-	else if(cancerBossScreen == true){cancerBossDraw();}
+	else if(cancerBossScreen==true){cancerBossDraw();}
 }
 public void mouseClicked()
 {
@@ -62,14 +62,13 @@ public void mouseClicked()
 		bossSelectScreen=true;
 		frameCounter=0;
 	}
-	if(bossSelectScreen==true&&cancerStart.isHovering()==true)
+	else if(bossSelectScreen==true&&cancerStart.isHovering()==true)
 	{
-		println("ran");
 		bossSelectScreen=false;
 		cancerEnterDraw();
 		cancerBossScreen=true;
 	}
-	if(bossBattleTrue==true&&returnToMainMenu.isHovering()==true)
+	else if(bossBattleTrue==true&&returnToMainMenu.isHovering()==true&&(winScreen==true||deathScreen==true))
 	{
 		cancerBossScreen=false;
 		winScreen=false;
@@ -96,7 +95,7 @@ public void shipMove()
 	frameCounter++;
 	if(shipHealth>0)
 	{
-		if (mousePressed==true&&frameCounter%6==0){fireBullet();}
+		if (mousePressed==true&&frameCounter%(int)(180/shipMagellan.getWarpPoint()*6)==0){fireBullet();}
 		if (frameCounter>=600){frameCounter=0;}
 		for (int i=0;i<bulletListLength;i++)
 		{
@@ -397,7 +396,7 @@ class SpaceShip extends Floater
     	}*/
     	if(nowDashing==true)
     	{
-
+    		dash();
     	}
     }
 	//ACTUAL POWERSURGE FUNCTION
@@ -422,7 +421,14 @@ class SpaceShip extends Floater
     }*/
     public void dash()
     {
-
+    	dashAccelerator=2;
+    	dashCounter++;
+    	if(dashCounter>=60)
+    	{
+			dashAccelerator=1;
+			nowDashing=false;
+			dashCounter=0;
+		}
     }
 }
 class Bullet extends Floater
@@ -487,11 +493,12 @@ class Bullet extends Floater
 }
 class CancerHead
 {
-	private int myHealth,cdLine,cdSpray,abCounter,targetX,targetY;
+	private int maxHealth,myHealth,cdLine,cdSpray,abCounter,targetX,targetY;
 	private boolean abLine,abSpray;
 	public CancerHead()
 	{
-		myHealth=180;
+		maxHealth=360;
+		myHealth=maxHealth;
 		cdLine=0;
 		cdSpray=0;
 		abCounter=0;
@@ -510,10 +517,10 @@ class CancerHead
 		rect(319,54,362,12);
 		stroke(255,0,255);
 		fill(255,0,255);
-		rect(320,55,(int)(myHealth*2),10);
-		cdLine++;
-		cdSpray++;
-		if((cdLine*Math.random())>600&&abSpray==false&&abLine==false)
+		rect(320,55,(int)(myHealth/(maxHealth/360.0)),10);
+		if(abLine==false){cdLine++;}
+		if(abSpray==false){cdSpray++;}
+		if((cdLine*Math.random())>60+(myHealth*2)&&abSpray==false&&abLine==false)
 		{
 			abLine=true;
 			targetX=shipMagellan.getX();
@@ -521,7 +528,7 @@ class CancerHead
 			cdLine=0;
 		}
 		if(abLine==true){fireLine();}
-		if((cdSpray*Math.random())>1000&&abLine==false&&abSpray==false)
+		if((cdSpray*Math.random())>100+(myHealth*2)&&abLine==false&&abSpray==false)
 		{
 			abSpray=true;
 			targetX=shipMagellan.getX();
@@ -546,11 +553,11 @@ class CancerHead
 		if((abCounter>=0)&&(abCounter%20==0))
 		{
 			asteroidList.add(new Asteroid(2,500,110,0,110));
-			asteroidList.add(new Asteroid(2,500,110,33,600));
-			asteroidList.add(new Asteroid(2,500,110,230,600));
-			asteroidList.add(new Asteroid(2,500,110,500,600));
-			asteroidList.add(new Asteroid(2,500,110,770,600));
-			asteroidList.add(new Asteroid(2,500,110,967,600));
+			asteroidList.add(new Asteroid(2,500,110,67,360));
+			asteroidList.add(new Asteroid(2,500,110,250,543));
+			asteroidList.add(new Asteroid(2,500,110,500,610));
+			asteroidList.add(new Asteroid(2,500,110,750,543));
+			asteroidList.add(new Asteroid(2,500,110,933,360));
 			asteroidList.add(new Asteroid(2,500,110,1000,110));
 		}
 		if(abCounter>=65)
@@ -772,7 +779,7 @@ class Button
 	private float myHoverConstant;
 	private String myText;
 	private int [] hoverRange;
-	private boolean hovering, clickable;
+	private boolean clickable;
 	public Button(String inputText, int inputTextSize, int inputX, int inputY, int inputWidth, int inputLength)
 	{
 		myText=inputText;
@@ -786,15 +793,13 @@ class Button
 		myStrokeColorHover=myStrokeColorNormal;
 		myFillColorHover=myFillColorNormal;
 		myHoverConstant=1.1;
-		hovering=false;
 		clickable=true;
 	}
 	public void show()
 	{
 		if(clickable==false){myFillColorNormal=color(220,220,220);}
-		if(mouseX>myX-(myWidth*0.5)&&mouseX<myX+(myWidth*0.5)&&mouseY>myY-(myLength*0.5)&&mouseY<myY+(myLength*0.5)&&clickable==true)
+		if(isHovering()==true&&clickable==true)
 		{
-			hovering=true;
 			stroke(myStrokeColorHover);
 			fill(myFillColorHover);
 			rect(myX-(0.5*myWidth*myHoverConstant),myY-(0.5*myLength*myHoverConstant),myWidth*myHoverConstant,myLength*myHoverConstant);
@@ -805,7 +810,6 @@ class Button
 		}
 		else
 		{
-			hovering=false;
 			stroke(myStrokeColorNormal);
 			fill(myFillColorNormal);
 			rect(myX-(0.5*myWidth),myY-(0.5*myLength),myWidth,myLength);
@@ -815,5 +819,15 @@ class Button
 			text(myText,myX,myY);		
 		}
 	}
-	public boolean isHovering(){return hovering;}
+	public boolean isHovering()
+	{
+		if(mouseX>myX-(myWidth*0.5)&&mouseX<myX+(myWidth*0.5)&&mouseY>myY-(myLength*0.5)&&mouseY<myY+(myLength*0.5))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 }
