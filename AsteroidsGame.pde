@@ -16,13 +16,14 @@ int bulletListLength = 0;
 int frameCounter = 0;
 int shipHealth = 50;
 int stayCounter = 0;
-//SCREENS
+//SCREENS AND COUNTERS
 boolean titleScreen = true;
 boolean bossSelectScreen = false;
 boolean cancerEnterScreen = false;
 boolean cancerBossScreen = false;
 boolean bossBattleTrue = false;
 boolean deathScreen = false;
+int dsCounter = 0;
 boolean winScreen = false;
 //BUTTONS
 Button aquariusStart;
@@ -75,6 +76,7 @@ public void mouseClicked()
 		deathScreen=false;
 		bossSelectScreen=true;
 		bossBattleTrue=false;
+		shipHealth=50;
 	}
 }
 public void titleDraw()
@@ -157,30 +159,36 @@ public void cancerBossDraw()
 }
 public void deathScreenDraw()
 {
-	frameCounter++;
-	if(cancerBossScreen==true&&frameCounter%6==0)
+	dsCounter++;
+	if(cancerBossScreen==true&&dsCounter%5==0)
 	{
 		cancerBossDraw();
+	}
+	if(dsCounter%5==0)
+	{
 		fill(255);
 		textSize(100);
 		textAlign(CENTER,CENTER); 
 		text("YOU DIED",500,275);
 	}
-	if(frameCounter>=6){frameCounter=1;}
+	if(dsCounter>=5){dsCounter=0;}
 	returnToMainMenu.show();
 }
 public void winScreenDraw()
 {
-	frameCounter++;
-	if(cancerBossScreen==true&&frameCounter%6==0)
+	dsCounter++;
+	if(cancerBossScreen==true&&dsCounter%5==0)
 	{
 		cancerBossDraw();
+	}
+	if(dsCounter%5==0)
+	{
 		fill(255);
 		textSize(100);
 		textAlign(CENTER,CENTER); 
 		text("YOU WON",500,275);
 	}
-	if(frameCounter>=6){frameCounter=1;}
+	if(dsCounter>=5){dsCounter=0;}
 	returnToMainMenu.show();
 }
 public void fireBullet()
@@ -497,7 +505,7 @@ class CancerHead
 	private boolean abLine,abSpray;
 	public CancerHead()
 	{
-		maxHealth=360;
+		maxHealth=720;
 		myHealth=maxHealth;
 		cdLine=0;
 		cdSpray=0;
@@ -650,8 +658,8 @@ class Asteroid extends Bullet
     	else
     	{
 			dRadians =((int)(Math.random()*361))*(Math.PI/180);
-			myDirectionX = (speedCont/((float)(astdSize)) * Math.cos(dRadians));
-			myDirectionY = (speedCont/((float)(astdSize)) * Math.sin(dRadians));
+			myDirectionX = (0.75*speedCont/((float)(astdSize)) * Math.cos(dRadians));
+			myDirectionY = (0.75*speedCont/((float)(astdSize)) * Math.sin(dRadians));
 		}
     }
     public void move()
