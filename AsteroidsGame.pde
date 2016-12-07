@@ -16,6 +16,7 @@ int bulletListLength = 0;
 int frameCounter = 0;
 int shipHealth = 50;
 int stayCounter = 0;
+boolean shipFiring = false;
 //SCREENS AND COUNTERS
 boolean titleScreen = true;
 boolean bossSelectScreen = false;
@@ -97,7 +98,14 @@ public void shipMove()
 	frameCounter++;
 	if(shipHealth>0)
 	{
-		if (mousePressed==true&&frameCounter%(int)(180/shipMagellan.getWarpPoint()*6)==0){fireBullet();}
+		System.out.println(shipMagellan.getWarpPoint());
+		if (mousePressed==true)
+		{
+			shipMagellan.setWarpPoint(shipMagellan.getWarpPoint()-1);
+			shipFiring=true;
+			if(frameCounter%(int)(180.0/(shipMagellan.getWarpPoint()+1))==0){fireBullet();}
+		}
+		else if(mousePressed==false){shipFiring=false;}
 		if (frameCounter>=600){frameCounter=0;}
 		for (int i=0;i<bulletListLength;i++)
 		{
@@ -126,7 +134,7 @@ public void shipMove()
 public void cancerEnterDraw()
 {
 	for(int lp1=asteroidList.size()-1;lp1>=0;lp1--){asteroidList.remove(lp1);}
-	for(int i =0;i<5;i++)
+	for(int i =0;i<2;i++)
 	{
 		asteroidList.add(new Asteroid(4,(int)(Math.random()*1360)-180,-80));
 	}
@@ -357,6 +365,7 @@ class SpaceShip extends Floater
     public void setPointDirection(int degrees){myPointDirection = degrees;}
     public double getPointDirection(){return myPointDirection;}
     public int getWarpPoint() {return warpPoint;}
+    public void setWarpPoint(int inputPoint){warpPoint=inputPoint;}
     public void accelerate()
     {
       	if (keyW==true) {myDirectionY=-speedCont;}
@@ -392,8 +401,9 @@ class SpaceShip extends Floater
         	dashPress=true;
         }
         else if(keyShift==false){dashPress=false;}
-    	if (warpPoint>=180){warpPoint = 180;}
-    	else{warpPoint++;}
+    	if(shipFiring==false){warpPoint++;}
+    	if (warpPoint>=180){warpPoint=180;}
+    	if(warpPoint<=0){warpPoint=0;}
     	//POWERSURGE ACTIVATOR
     	/*if(shipSpecial==true)
     	{
@@ -536,11 +546,9 @@ class CancerHead
 			cdLine=0;
 		}
 		if(abLine==true){fireLine();}
-		if((cdSpray*Math.random())>100+(myHealth*2)&&abLine==false&&abSpray==false)
+		if((cdSpray*Math.random())>100+(myHealth*2*1.6)&&abLine==false&&abSpray==false)
 		{
 			abSpray=true;
-			targetX=shipMagellan.getX();
-			targetY=shipMagellan.getY();
 			cdSpray=0;
 		}
 		if(abSpray==true){fireSpray();}
@@ -577,8 +585,8 @@ class CancerHead
 }
 class Asteroid extends Bullet
 {
-	int astdSize, targetX, targetY;
-	boolean astdSpecial;
+	private int astdSize, targetX, targetY;
+	private boolean astdSpecial;
 	public Asteroid(int inputSize, double inputX, double inputY)
 	{
 		corners = 8;
