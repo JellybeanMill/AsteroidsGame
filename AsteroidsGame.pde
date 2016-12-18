@@ -1,6 +1,7 @@
 //NESSESSARY OBJECT DECLARATIONS
 SpaceShip shipMagellan;
 Bullet [] bulletList;
+AriesHead mainAriesHead;
 CancerHead mainCancerHead;
 ArrayList <Asteroid> asteroidList = new ArrayList <Asteroid>();
 //INPUT VARIABLES
@@ -20,7 +21,7 @@ boolean shipFiring = false;
 //SCREENS AND COUNTERS
 boolean titleScreen = true;
 boolean bossSelectScreen = false;
-boolean cancerEnterScreen = false;
+boolean ariesBossScreen = false;
 boolean cancerBossScreen = false;
 boolean bossBattleTrue = false;
 boolean deathScreen = false;
@@ -45,7 +46,8 @@ public void setup()
 	size(1000,600);
 	shipMagellan = new SpaceShip();
 	bulletList = new Bullet[300];
-	cancerStart = new Button("CANCER",20,875,150,150,150);
+	cancerStart = new Button("CANCER",20,860,150,200,150);
+	ariesStart = new Button("ARIES",20,140,150,200,150);
 	returnToMainMenu = new Button("Main Menu",20,500,450,150,50);
 }
 public void draw()
@@ -54,6 +56,7 @@ public void draw()
 	else if(bossSelectScreen==true){bossSelectDraw();}
 	else if(deathScreen==true){deathScreenDraw();}
 	else if(winScreen==true){winScreenDraw();}
+	else if(ariesBossScreen==true){ariesBossDraw();}
 	else if(cancerBossScreen==true){cancerBossDraw();}
 }
 public void mouseClicked()
@@ -64,11 +67,20 @@ public void mouseClicked()
 		bossSelectScreen=true;
 		frameCounter=0;
 	}
-	else if(bossSelectScreen==true&&cancerStart.isHovering()==true)
+	else if(bossSelectScreen==true)
 	{
-		bossSelectScreen=false;
-		cancerEnterDraw();
-		cancerBossScreen=true;
+		if(ariesStart.isHovering()==true)
+		{
+			bossSelectScreen=false;
+			ariesEnterDraw();
+			ariesBossScreen=true;
+		}
+		else if(cancerStart.isHovering()==true)
+		{
+			bossSelectScreen=false;
+			cancerEnterDraw();
+			cancerBossScreen=true;
+		}
 	}
 	else if(bossBattleTrue==true&&returnToMainMenu.isHovering()==true&&(winScreen==true||deathScreen==true))
 	{
@@ -92,6 +104,7 @@ public void bossSelectDraw()
 {
 	background(0);
 	cancerStart.show();
+	ariesStart.show();
 }
 public void shipMove()
 {
@@ -101,9 +114,12 @@ public void shipMove()
 		System.out.println(shipMagellan.getWarpPoint());
 		if (mousePressed==true)
 		{
-			shipMagellan.setWarpPoint(shipMagellan.getWarpPoint()-1);
 			shipFiring=true;
-			if(frameCounter%(int)(180.0/(shipMagellan.getWarpPoint()+1))==0){fireBullet();}
+			if(frameCounter%(int)(180.0/(shipMagellan.getWarpPoint()/2+1))==0)
+			{
+				shipMagellan.setWarpPoint(shipMagellan.getWarpPoint()-1);
+				fireBullet();
+			}
 		}
 		else if(mousePressed==false){shipFiring=false;}
 		if (frameCounter>=600){frameCounter=0;}
@@ -130,6 +146,17 @@ public void shipMove()
     	deathScreen=true;
     	shipHealth=0;
     }
+}
+public void ariesEnterDraw()
+{
+	mainAriesHead = new AriesHead();
+	bossBattleTrue = true;
+}
+public void ariesBossDraw()
+{
+	background(0);
+	shipMove();
+	mainAriesHead.show();
 }
 public void cancerEnterDraw()
 {
@@ -211,7 +238,7 @@ public void fireBullet()
 		bulletList[bulletNum] = new Bullet();
 		bulletList[bulletNum].accelerate();
 	}
-	else 
+	else
 	{
 		bulletList[bulletListLength] = new Bullet();
 		bulletList[bulletListLength].accelerate();
@@ -509,6 +536,27 @@ class Bullet extends Floater
     	else {isDead =true;}
     }
 }
+class AriesHead
+{
+	private double myX, myY, radDirection, myHealth, maxHealth;
+	public AriesHead()
+	{
+		myX=500;
+		myY=100;
+		radDirection=radians(270);
+		maxHealth=0;
+		myHealth=720;
+	}
+	public void show()
+	{
+		radDirection=atan2((float)(shipMagellan.getY()-myY),(float)(shipMagellan.getX()-myX));
+		noStroke();
+		fill(128,128,128);
+		ellipse((float)myX,(float)myY,100,100);
+		fill(255,0,0);
+		ellipse((float)(myX+(30*Math.cos(radDirection))),(float)(myY+(30*Math.sin(radDirection))),10,10);
+	}
+}
 class CancerHead
 {
 	private int maxHealth,myHealth,cdLine,cdSpray,abCounter,targetX,targetY;
@@ -777,7 +825,7 @@ abstract class Floater //Do NOT modify the Floater class! Make changes in the Sp
     stroke(myColor);    
     //convert degrees to radians for sin and cos         
     double dRadians = myPointDirection*(Math.PI/180);                 
-    int xRotatedTranslated, yRotatedTranslated;    
+    int xRotatedTranslated, yRotatedTranslated;
     beginShape();         
     for(int nI = 0; nI < corners; nI++)    
     {     
