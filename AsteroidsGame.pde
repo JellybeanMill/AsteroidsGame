@@ -111,11 +111,10 @@ public void shipMove()
 	frameCounter++;
 	if(shipHealth>0)
 	{
-		System.out.println(shipMagellan.getWarpPoint());
 		if (mousePressed==true)
 		{
 			shipFiring=true;
-			if(frameCounter%(int)(180.0/(shipMagellan.getWarpPoint()/2+1))==0)
+			if(frameCounter%((int)(180.0/(shipMagellan.getWarpPoint()/2+5))+1)==0)
 			{
 				shipMagellan.setWarpPoint(shipMagellan.getWarpPoint()-1);
 				fireBullet();
@@ -538,14 +537,19 @@ class Bullet extends Floater
 }
 class AriesHead
 {
-	private double myX, myY, radDirection, myHealth, maxHealth;
+	private int cdCharge, abCounter;
+	private double myX, myY, radDirection, myHealth, maxHealth, lockedRadDirection,secTravelDist;
+	private boolean abCharge;
 	public AriesHead()
 	{
 		myX=500;
 		myY=100;
 		radDirection=radians(270);
-		maxHealth=0;
-		myHealth=720;
+		lockedRadDirection=radDirection;
+		maxHealth=720;
+		myHealth=maxHealth;
+		cdCharge=0;
+		abCounter=0;
 	}
 	public void show()
 	{
@@ -554,7 +558,34 @@ class AriesHead
 		fill(128,128,128);
 		ellipse((float)myX,(float)myY,100,100);
 		fill(255,0,0);
-		ellipse((float)(myX+(30*Math.cos(radDirection))),(float)(myY+(30*Math.sin(radDirection))),10,10);
+		if(abCharge==false)
+		{
+			ellipse((float)(myX+(30*Math.cos(radDirection))),(float)(myY+(30*Math.sin(radDirection))),10,10);
+			cdCharge++;
+		}
+		else{ellipse((float)(myX+(30*Math.cos(lockedRadDirection))),(float)(myY+(30*Math.sin(lockedRadDirection))),10,10);}
+		if(Math.random()*cdCharge>60+(myHealth))
+		{
+			abCharge=true;
+			secTravelDist=(dist((float)myX,(float)myY,shipMagellan.getX(),shipMagellan.getY()))/10.0;
+			lockedRadDirection=radDirection;
+			cdCharge=0;
+		}
+		if(abCharge==true){fireCharge();}
+	}
+	public void fireCharge()
+	{
+		abCounter++;
+		if(abCounter>60)
+		{
+			myX=myX+(secTravelDist*Math.cos(lockedRadDirection));
+			myY=myY+(secTravelDist*Math.sin(lockedRadDirection));
+		}
+		if(abCounter>=70)
+		{
+			abCharge=false;
+			abCounter=0;
+		}
 	}
 }
 class CancerHead
