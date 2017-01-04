@@ -281,6 +281,10 @@ public void loadBar()
 	fill(255);
 	rect(10,580,(int)(shipHealth*3.6),10);
 }
+public void hitSomethingAries()
+{
+	
+}
 public void hitSomethingCancer()
 {
 	//BULLET ASTEROID CONTACT
@@ -576,12 +580,12 @@ class AriesHead
 	public void fireCharge()
 	{
 		abCounter++;
-		if(abCounter>60)
+		if(abCounter>45)
 		{
 			myX=myX+(secTravelDist*Math.cos(lockedRadDirection));
 			myY=myY+(secTravelDist*Math.sin(lockedRadDirection));
 		}
-		if(abCounter>=70)
+		if(abCounter>=55)
 		{
 			abCharge=false;
 			abCounter=0;
