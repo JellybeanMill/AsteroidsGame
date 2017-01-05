@@ -283,7 +283,7 @@ public void loadBar()
 }
 public void hitSomethingAries()
 {
-	
+	//HOLD
 }
 public void hitSomethingCancer()
 {
@@ -361,7 +361,7 @@ public void destroyAsteroids()
 class SpaceShip extends Floater  
 {
 	private int warpPoint,dashCounter,dashAccelerator;
-	private boolean shipSpecial,dashPress,nowDashing;
+	private boolean shipSpecial,dashPress,nowDashing,statEffNoControl;
     public SpaceShip()
     {
         corners = 26;
@@ -383,6 +383,7 @@ class SpaceShip extends Floater
         nowDashing=false;
         dashCounter=0;
         dashAccelerator=1;
+        statEffNoControl=false;
     }
     public void setX(int x) {myCenterX = x;}
     public int getX(){return (int)myCenterX;}
@@ -396,24 +397,28 @@ class SpaceShip extends Floater
     public double getPointDirection(){return myPointDirection;}
     public int getWarpPoint() {return warpPoint;}
     public void setWarpPoint(int inputPoint){warpPoint=inputPoint;}
+    public void setNoControl(boolean statEff){statEffNoControl=statEff;}
     public void accelerate()
     {
-      	if (keyW==true) {myDirectionY=-speedCont;}
-      	if (keyA==true) {myDirectionX=-speedCont;}
-      	if (keyS==true) {myDirectionY= speedCont;}
-      	if (keyD==true) {myDirectionX= speedCont;}
-      	if (keyW==false&&keyS==false&&myDirectionY!=0)
-      	{
-      		if (myDirectionY>0) {myDirectionY-=speedCont*0.05;}
-      		if (myDirectionY<0) {myDirectionY+=speedCont*0.05;}
-      		if (abs((float)myDirectionY)<speedCont*0.05) {myDirectionY=0;}
-      	}
-      	if (keyA==false&&keyD==false&&myDirectionX!=0)
-      	{
-      		if (myDirectionX>0) {myDirectionX-=speedCont*0.05;}
-      		if (myDirectionX<0) {myDirectionX+=speedCont*0.05;}
-			if (abs((float)myDirectionX)<speedCont*0.05) {myDirectionX=0;}
-      	}
+    	if(statEffNoControl==false)
+    	{
+      		if (keyW==true) {myDirectionY=-speedCont;}
+      		if (keyA==true) {myDirectionX=-speedCont;}
+      		if (keyS==true) {myDirectionY= speedCont;}
+      		if (keyD==true) {myDirectionX= speedCont;}
+      		if (keyW==false&&keyS==false&&myDirectionY!=0)
+      		{
+      			if (myDirectionY>0) {myDirectionY-=speedCont*0.05;}
+      			if (myDirectionY<0) {myDirectionY+=speedCont*0.05;}
+      			if (abs((float)myDirectionY)<speedCont*0.05) {myDirectionY=0;}
+      		}
+      		if (keyA==false&&keyD==false&&myDirectionX!=0)
+      		{
+      			if (myDirectionX>0) {myDirectionX-=speedCont*0.05;}
+      			if (myDirectionX<0) {myDirectionX+=speedCont*0.05;}
+				if (abs((float)myDirectionX)<speedCont*0.05) {myDirectionX=0;}
+    	  	}
+    	}
     }
     public void rotate(){myPointDirection=(Math.atan2(mouseY-myCenterY,mouseX-myCenterX))/PI*180;}
     public void move ()
@@ -585,10 +590,19 @@ class AriesHead
 			myX=myX+(secTravelDist*Math.cos(lockedRadDirection));
 			myY=myY+(secTravelDist*Math.sin(lockedRadDirection));
 		}
+		if(dist(shipMagellan.getX(),shipMagellan.getY(),(float)myX,(float)myY)<=70)
+		{
+			shipMagellan.setNoControl(true);
+			shipHealth-=10;
+			float launchDirection=(float)(Math.atan2(shipMagellan.getY()-myY,shipMagellan.getX()-myX));
+			shipMagellan.setDirectionX(secTravelDist*2*Math.cos(launchDirection));
+			shipMagellan.setDirectionY(secTravelDist*2*Math.sin(launchDirection));
+		}
 		if(abCounter>=55)
 		{
 			abCharge=false;
 			abCounter=0;
+			shipMagellan.setNoControl(false);
 		}
 	}
 }
