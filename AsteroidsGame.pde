@@ -157,6 +157,7 @@ public void ariesBossDraw()
 	shipMove();
 	mainAriesHead.show();
 }
+/* MOVED
 public void cancerEnterDraw()
 {
 	for(int lp1=asteroidList.size()-1;lp1>=0;lp1--){asteroidList.remove(lp1);}
@@ -190,7 +191,7 @@ public void cancerBossDraw()
 		winScreen=true;
 		mainCancerHead.setHealth(0);
 	}
-}
+}*/
 public void deathScreenDraw()
 {
 	dsCounter++;
@@ -483,7 +484,7 @@ class SpaceShip extends Floater
 			dashCounter=0;
 		}
     }
-}
+}/*MOVED
 class Bullet extends Floater
 {
 	protected int fuelPoint;
@@ -543,7 +544,7 @@ class Bullet extends Floater
     	if (fuelPoint >=0) {myColor = color(0,fuelPoint,0);}
     	else {isDead =true;}
     }
-}
+}*/
 class AriesHead
 {
 	private int cdCharge, abCounter;
@@ -605,7 +606,7 @@ class AriesHead
 			shipMagellan.setNoControl(false);
 		}
 	}
-}
+}/* MOVED
 class CancerHead
 {
 	private int maxHealth,myHealth,cdLine,cdSpray,abCounter,targetX,targetY;
@@ -885,7 +886,7 @@ abstract class Floater //Do NOT modify the Floater class! Make changes in the Sp
     }   
     endShape(CLOSE);  
   }   
-}
+}*/
 class Button
 {
 	private int myX, myY, myWidth, myLength, myTextSize, myStrokeColorNormal, myStrokeColorHover, myFillColorNormal, myFillColorHover;
